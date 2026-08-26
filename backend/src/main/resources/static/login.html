@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus 360 - Login</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card login-card p-4">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-primary">SMART CAMPUS 360</h3>
+            <p class="text-muted">Sign in to your college workspace</p>
+        </div>
+
+        <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
+
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-id form-control" id="email" required placeholder="name@smartcampus.com">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-2 fw-bold">
+                <span id="btnText">Sign In</span>
+                <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="mb-0 text-muted">Don't have an account? <a href="register.html" class="fw-bold">Register here</a></p>
+            <a href="index.html" class="d-block mt-2 text-decoration-none">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Centered API helper -->
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorAlert = document.getElementById('errorAlert');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            // Form Validation
+            if (!email || !password) {
+                errorAlert.textContent = "Please fill in all fields.";
+                errorAlert.classList.remove('d-none');
+                return;
+            }
+
+            // UI feedback
+            errorAlert.classList.add('d-none');
+            submitBtn.disabled = true;
+            btnText.textContent = "Signing In...";
+            btnSpinner.classList.remove('d-none');
+
+            try {
+                const response = await API.post('/api/auth/login', { email, password });
+                
+                // Store authentication metadata
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('email', response.email);
+                localStorage.setItem('role', response.role);
+                localStorage.setItem('name', response.name);
+                localStorage.setItem('userId', response.userId);
+                if (response.profileId) {
+                    localStorage.setItem('profileId', response.profileId);
+                }
+
+                // Redirect to dashboard
+                API.redirectToDashboard(response.role);
+
+            } catch (error) {
+                errorAlert.textContent = error.message || "Invalid credentials. Please try again.";
+                errorAlert.classList.remove('d-none');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = "Sign In";
+                btnSpinner.classList.add('d-none');
+            }
+        });
+    </script>
+</body>
+</html>

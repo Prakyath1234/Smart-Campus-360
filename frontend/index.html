@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus 360 - Home</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        .feature-card {
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .icon-box {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 15px;
+        }
+        .emergency-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.25rem;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+            transition: all 0.3s;
+        }
+        .emergency-btn:hover {
+            background-color: #bb2d3b;
+            color: white;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-mortarboard-fill me-2 text-primary"></i>SMART CAMPUS 360
+            </a>
+            <button class="navbar-dark navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light me-2" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary" href="register.html">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Smart Campus Management &amp; Emergency SOS</h1>
+            <p class="lead mb-4">A unified web portal connecting Students, Faculty, Administrators, and Security Staff for seamless coordination and swift safety responses.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="login.html" class="btn btn-light btn-lg px-4 fw-bold text-primary">Get Started</a>
+                <button class="emergency-btn" onclick="triggerQuickAlert()"><i class="bi bi-exclamation-triangle-fill me-2"></i>QUICK SOS ALERT</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Key Features Section -->
+    <section class="container my-5 py-4">
+        <h2 class="text-center fw-bold mb-5">Key Portals &amp; Features</h2>
+        <div class="row g-4">
+            <!-- Student Portal -->
+            <div class="col-md-3">
+                <div class="card feature-card p-4 text-center">
+                    <div class="icon-box"><i class="bi bi-person-fill"></i></div>
+                    <h5 class="fw-bold">Student Portal</h5>
+                    <p class="text-muted">Track subject-wise attendance, view exam marks, file leave requests, submit complaints, and view schedules.</p>
+                </div>
+            </div>
+            <!-- Faculty Desk -->
+            <div class="col-md-3">
+                <div class="card feature-card p-4 text-center">
+                    <div class="icon-box"><i class="bi bi-journal-check"></i></div>
+                    <h5 class="fw-bold">Faculty Desk</h5>
+                    <p class="text-muted">Enter student marks, record attendance daily, review student leave files, and announce key academic events.</p>
+                </div>
+            </div>
+            <!-- Admin Dashboard -->
+            <div class="col-md-3">
+                <div class="card feature-card p-4 text-center">
+                    <div class="icon-box"><i class="bi bi-shield-lock-fill"></i></div>
+                    <h5 class="fw-bold">Admin Console</h5>
+                    <p class="text-muted">Configure departments, assign course subjects, review AI-routed student complaints, and compile campus reports.</p>
+                </div>
+            </div>
+            <!-- Safety Response -->
+            <div class="col-md-3">
+                <div class="card feature-card p-4 text-center">
+                    <div class="icon-box"><i class="bi bi-broadcast-pin"></i></div>
+                    <h5 class="fw-bold">Security Station</h5>
+                    <p class="text-muted">Acknowledge student emergency SOS signals in real-time with coordinate tracking and log responses.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Details Section -->
+    <section class="bg-light py-5">
+        <div class="container text-center">
+            <h3 class="fw-bold mb-3">🚨 Real-time Emergency SOS Feature</h3>
+            <p class="lead text-muted mx-auto" style="max-width: 800px;">
+                With coordinate transmission, the signature SOS alert instantly propagates to both security staff and administrators, triggering immediate desktop alarms and status dispatch logs.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Smart Campus 360. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function triggerQuickAlert() {
+            alert("To trigger a real SOS, please Login as a Student. This authorizes coordinate logging and safety tracking.");
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

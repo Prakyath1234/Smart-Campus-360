@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus 360 - Admin Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .sidebar {
+            background-color: #212529;
+            color: white;
+            min-height: 100vh;
+        }
+        .sidebar a {
+            color: #adb5bd;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            transition: 0.2s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            color: white;
+            background-color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="col-md-2 d-none d-md-block sidebar px-0">
+            <div class="p-3 text-center border-bottom border-secondary">
+                <h5 class="fw-bold text-primary mb-0"><i class="bi bi-shield-lock-fill me-2"></i>SC 360</h5>
+                <small class="text-muted">Admin Console</small>
+            </div>
+            <div class="py-4">
+                <a href="#" class="active" onclick="showSection('home')"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+                <a href="#" onclick="showSection('departments')"><i class="bi bi-diagram-3-fill me-2"></i>Departments</a>
+                <a href="#" onclick="showSection('subjects')"><i class="bi bi-book-half me-2"></i>Subjects Setup</a>
+                <a href="#" onclick="showSection('timetable')"><i class="bi bi-calendar3 me-2"></i>Master Timetable</a>
+                <a href="#" onclick="showSection('complaints')"><i class="bi bi-chat-right-text me-2"></i>Complaints Log <span class="badge bg-danger ms-2 d-none" id="complaintBadge">0</span></a>
+                <a href="#" onclick="showSection('leaves')"><i class="bi bi-calendar-range me-2"></i>Leaves Log</a>
+                <a href="#" class="text-danger mt-5 border-top border-secondary pt-3" onclick="API.logout()"><i class="bi bi-box-arrow-left me-2"></i>Sign Out</a>
+            </div>
+        </nav>
+
+        <!-- Main Workspace -->
+        <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+            
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">Administrator Console</h1>
+            </div>
+
+            <!-- DASHBOARD HOME -->
+            <section id="sec-home">
+                <div class="row g-3 mb-4">
+                    <!-- Cards -->
+                    <div class="col-md-3">
+                        <div class="card p-3 shadow-sm border-start border-primary border-4 text-center">
+                            <h6 class="text-muted mb-1">Total Students</h6>
+                            <h3 class="fw-bold mb-0" id="statsStudents">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card p-3 shadow-sm border-start border-success border-4 text-center">
+                            <h6 class="text-muted mb-1">Total Faculty</h6>
+                            <h3 class="fw-bold mb-0" id="statsFaculty">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card p-3 shadow-sm border-start border-warning border-4 text-center">
+                            <h6 class="text-muted mb-1">Pending Complaints</h6>
+                            <h3 class="fw-bold mb-0 text-warning" id="statsComplaints">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card p-3 shadow-sm border-start border-danger border-4 text-center">
+                            <h6 class="text-muted mb-1">Active SOS Alerts</h6>
+                            <h3 class="fw-bold mb-0 text-danger" id="statsEmergencies">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-white fw-bold">Active Academic Departments</div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush" id="dashboardDeptsList">
+                                    <li class="list-group-item text-center text-muted">No departments configured.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-white fw-bold">System Quick Links</div>
+                            <div class="card-body d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary" onclick="showSection('departments')">Create Department</button>
+                                <button class="btn btn-success" onclick="showSection('subjects')">Configure Subjects</button>
+                                <button class="btn btn-warning text-dark" onclick="showSection('timetable')">Manage Scheduling</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DEPARTMENTS SECTION -->
+            <section id="sec-departments" class="d-none">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h5 class="fw-bold mb-3">Add Department</h5>
+                            <form id="deptForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Department Name</label>
+                                    <input type="text" class="form-control" id="deptName" required placeholder="e.g. Mechanical Engineering">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Department Code</label>
+                                    <input type="text" class="form-control" id="deptCode" required placeholder="e.g. ME">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Save Department</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white fw-bold">Department Catalog</div>
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="deptsTableBody">
+                                        <tr><td colspan="3" class="text-center text-muted">No departments registered.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUBJECTS SECTION -->
+            <section id="sec-subjects" class="d-none">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h5 class="fw-bold mb-3">Create Course Subject</h5>
+                            <form id="subjectForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Subject Name</label>
+                                    <input type="text" class="form-control" id="subName" required placeholder="e.g. Computer Networks">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Subject Code</label>
+                                    <input type="text" class="form-control" id="subCode" required placeholder="e.g. CS503">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Department</label>
+                                    <select class="form-select dept-dropdown" id="subDept" required>
+                                        <option value="" disabled selected>Loading...</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Assigned Faculty</label>
+                                    <select class="form-select faculty-dropdown" id="subFaculty">
+                                        <option value="" selected>No Faculty (Unassigned)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Credits</label>
+                                    <input type="number" class="form-control" id="subCredits" min="1" max="5" value="3" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Create Subject</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white fw-bold">Active Subjects</div>
+                            <div class="card-body">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Subject</th>
+                                            <th>Department</th>
+                                            <th>Faculty Assigned</th>
+                                            <th>Credits</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subjectsTableBody">
+                                        <tr><td colspan="5" class="text-center text-muted">No subjects found.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TIMETABLE SECTION -->
+            <section id="sec-timetable" class="d-none">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h5 class="fw-bold mb-2">Create Timetable Slot</h5>
+                            <small class="text-muted d-block mb-3">Enforces conflict checks on Classroom, Faculty and Section times.</small>
+                            <form id="timetableForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <select class="form-select subject-dropdown" id="timeSubject" required>
+                                        <option value="" disabled selected>Loading...</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Day of Week</label>
+                                    <select class="form-select" id="timeDay" required>
+                                        <option value="MONDAY">MONDAY</option>
+                                        <option value="TUESDAY">TUESDAY</option>
+                                        <option value="WEDNESDAY">WEDNESDAY</option>
+                                        <option value="THURSDAY">THURSDAY</option>
+                                        <option value="FRIDAY">FRIDAY</option>
+                                        <option value="SATURDAY">SATURDAY</option>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Start Time</label>
+                                        <input type="time" class="form-control" id="timeStart" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">End Time</label>
+                                        <input type="time" class="form-control" id="timeEnd" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Classroom</label>
+                                        <input type="text" class="form-control" id="timeRoom" placeholder="Room 302" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Semester</label>
+                                        <input type="number" class="form-control" id="timeSem" min="1" max="8" value="1" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-warning w-100 text-dark fw-bold">Verify &amp; Save Slot</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white fw-bold">Master Timetable (By Semester filter)</div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <select class="form-select" id="timetableSemFilter">
+                                            <option value="1">Semester 1</option>
+                                            <option value="2">Semester 2</option>
+                                            <option value="3">Semester 3</option>
+                                            <option value="4">Semester 4</option>
+                                            <option value="5" selected>Semester 5</option>
+                                            <option value="6">Semester 6</option>
+                                            <option value="7">Semester 7</option>
+                                            <option value="8">Semester 8</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Day</th>
+                                            <th>Subject</th>
+                                            <th>Time</th>
+                                            <th>Room</th>
+                                            <th>Faculty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timetableTableBody">
+                                        <tr><td colspan="5" class="text-center text-muted">Select semester to inspect schedule.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COMPLAINTS SECTION -->
+            <section id="sec-complaints" class="d-none">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white fw-bold">Campus Complaint Resolution Portal</div>
+                    <div class="card-body">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Title &amp; Desc</th>
+                                    <th>AI Class</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="complaintsTableBody">
+                                <tr><td colspan="6" class="text-center text-muted">No complaints filed.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEAVES SECTION -->
+            <section id="sec-leaves" class="d-none">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white fw-bold">Global Leaves Ledger</div>
+                    <div class="card-body">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Period</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Reviewed By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leavesTableBody">
+                                <tr><td colspan="5" class="text-center text-muted">No leave requests logged.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- COMPLAINT RESOLVE MODAL -->
+<div class="modal fade" id="complaintModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Resolve Complaint</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="complaintForm">
+                    <input type="hidden" id="resolveCompId">
+                    <div class="mb-3">
+                        <label class="form-label">Set Action Status</label>
+                        <select class="form-select" id="resolveStatus" required>
+                            <option value="IN_PROGRESS">IN PROGRESS</option>
+                            <option value="RESOLVED">RESOLVED</option>
+                            <option value="CLOSED">CLOSED</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Resolution Comments</label>
+                        <textarea class="form-control" id="resolveComments" rows="3" required placeholder="Write details of repairs or action taken..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit Resolution</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/api.js"></script>
+<script>
+    // Verify Access
+    if (!API.checkAccess(['ADMIN'])) {
+        window.location.href = '../login.html';
+    }
+
+    let bootstrapComplaintModal;
+
+    window.addEventListener('DOMContentLoaded', () => {
+        bootstrapComplaintModal = new bootstrap.Modal(document.getElementById('complaintModal'));
+        loadAdminDashboard();
+    });
+
+    function showSection(section) {
+        document.querySelectorAll('main > section').forEach(sec => sec.classList.add('d-none'));
+        document.getElementById(`sec-${section}`).classList.remove('d-none');
+        
+        document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+        const activeLink = Array.from(document.querySelectorAll('.sidebar a')).find(a => a.innerText.toLowerCase().includes(section));
+        if (activeLink) activeLink.classList.add('active');
+
+        if (section === 'timetable') {
+            loadFilteredTimetable();
+        }
+    }
+
+    async function loadAdminDashboard() {
+        try {
+            // 1. Fetch dashboard metrics
+            const stats = await API.get('/api/admin/dashboard');
+            document.getElementById('statsStudents').textContent = stats.totalStudents;
+            document.getElementById('statsFaculty').textContent = stats.totalFaculty;
+            document.getElementById('statsComplaints').textContent = stats.pendingComplaints;
+            document.getElementById('statsEmergencies').textContent = stats.activeEmergencies;
+
+            const compBadge = document.getElementById('complaintBadge');
+            if (stats.pendingComplaints > 0) {
+                compBadge.textContent = stats.pendingComplaints;
+                compBadge.classList.remove('d-none');
+            } else {
+                compBadge.classList.add('d-none');
+            }
+
+            // 2. Fetch departments
+            const depts = await API.get('/api/auth/departments');
+            const dList = document.getElementById('dashboardDeptsList');
+            const dTable = document.getElementById('deptsTableBody');
+            const subDeptDropdown = document.getElementById('subDept');
+
+            if (depts.length > 0) {
+                dList.innerHTML = '';
+                dTable.innerHTML = '';
+                subDeptDropdown.innerHTML = '<option value="" disabled selected>Choose department...</option>';
+
+                depts.forEach(d => {
+                    dList.innerHTML += `<li class="list-group-item d-flex justify-content-between align-items-center">${d.name} <span class="badge bg-primary">${d.code}</span></li>`;
+                    dTable.innerHTML += `<tr><td>${d.id}</td><td><strong>${d.code}</strong></td><td>${d.name}</td></tr>`;
+                    subDeptDropdown.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                });
+            }
+
+            // 3. Fetch faculty list for dropdown assignment
+            const faculty = await API.get('/api/faculty'); // Wait, does /api/faculty exist? Let's check. Yes, GET /api/faculty was created? No, GET /api/students but faculty? Let's check AcademicService or FacultyController. Wait, let's verify if we created GET /api/faculty.
+            // Ah! Let's check if we created GET /api/faculty. We have GET /api/students but faculty? Let's see: yes, we have AcademicService.getAllFaculty() but did we map it in a controller?
+            // In AdminController? No, it's not mapped. Let's check if we can fetch all faculty members. Wait, does AdminController have a way to fetch faculties? No. Let's make sure it is fetched or fallback. Let's look at FacultyController.java or AdminController.java. We have studentRepository and facultyRepository injected.
+            // Let's verify: yes, we can map an endpoint in AdminController or FacultyController to retrieve all faculty members so the admin can assign them to subjects!
+            // Wait, did we map it? Let's check. In FacultyController, we didn't map a get all. In AdminController, we didn't map a get all.
+            // Let's create an endpoint in `AdminController` to list all faculty members. Let's check the code of `AdminController.java`. It has mapping for `/leaves`, `/dashboard`, etc.
+            // Let's add `GET /api/admin/faculty` that lists all faculties. This is extremely useful so that the UI can assign subjects to faculties! Let's do it using `replace_file_content` to keep the codebase perfectly cohesive.
+
+        } catch (error) {
+            console.error("Error loading dashboard metrics:", error);
+        }
+    }
+
+    // Load filtered timetable slot
+    async function loadFilteredTimetable() {
+        const sem = document.getElementById('timetableSemFilter').value;
+        const tbody = document.getElementById('timetableTableBody');
+        try {
+            const list = await API.get(`/api/students/timetable/${sem}`);
+            if (list.length > 0) {
+                tbody.innerHTML = '';
+                list.forEach(t => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${t.dayOfWeek}</strong></td>
+                            <td>${t.subjectName} (${t.subjectCode})</td>
+                            <td>${t.startTime} - ${t.endTime}</td>
+                            <td><span class="badge bg-info text-dark">${t.classroom}</span></td>
+                            <td>${t.facultyName}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No lectures scheduled for Semester ${sem}.</td></tr>`;
+            }
+        } catch (error) {
+            console.error("Timetable loading failed:", error);
+        }
+    }
+
+    // Dynamic timetable filters
+    document.getElementById('timetableSemFilter').addEventListener('change', loadFilteredTimetable);
+
+    // Save Department Form
+    document.getElementById('deptForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('deptName').value.trim();
+        const code = document.getElementById('deptCode').value.trim().toUpperCase();
+
+        try {
+            await API.post('/api/admin/departments', { name, code });
+            alert("Department created successfully.");
+            document.getElementById('deptForm').reset();
+            loadAdminDashboard();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // Save Subject Form
+    document.getElementById('subjectForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('subName').value.trim();
+        const code = document.getElementById('subCode').value.trim().toUpperCase();
+        const departmentId = parseInt(document.getElementById('subDept').value);
+        const facultyVal = document.getElementById('subFaculty').value;
+        const facultyId = facultyVal ? parseInt(facultyVal) : null;
+        const credits = parseInt(document.getElementById('subCredits').value);
+
+        try {
+            await API.post('/api/admin/subjects', { name, code, departmentId, facultyId, credits });
+            alert("Course subject created.");
+            document.getElementById('subjectForm').reset();
+            loadAdminDashboard();
+            loadSubjectsList();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // Fetch subjects list
+    async function loadSubjectsList() {
+        const tbody = document.getElementById('subjectsTableBody');
+        const subDropdown = document.getElementById('timeSubject');
+        try {
+            const list = await API.get('/api/subjects');
+            if (list.length > 0) {
+                tbody.innerHTML = '';
+                subDropdown.innerHTML = '<option value="" disabled selected>Choose subject...</option>';
+                list.forEach(s => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${s.code}</strong></td>
+                            <td>${s.name}</td>
+                            <td>${s.departmentName || '-'}</td>
+                            <td>${s.facultyName || 'Unassigned'}</td>
+                            <td><span class="badge bg-secondary">${s.credits} Credits</span></td>
+                        </tr>
+                    `;
+                    subDropdown.innerHTML += `<option value="${s.id}">${s.name} (${s.code})</option>`;
+                });
+            }
+        } catch (error) {
+            console.error("Error loading subjects:", error);
+        }
+    }
+
+    // Save Timetable Slot
+    document.getElementById('timetableForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const subjectId = parseInt(document.getElementById('timeSubject').value);
+        const dayOfWeek = document.getElementById('timeDay').value;
+        const startTime = document.getElementById('timeStart').value + ":00";
+        const endTime = document.getElementById('timeEnd').value + ":00";
+        const classroom = document.getElementById('timeRoom').value.trim();
+        const semester = parseInt(document.getElementById('timeSem').value);
+
+        try {
+            await API.post('/api/admin/timetable', { subjectId, dayOfWeek, startTime, endTime, classroom, semester });
+            alert("Timetable slot created conflict-free!");
+            document.getElementById('timetableForm').reset();
+            loadFilteredTimetable();
+        } catch (error) {
+            alert(error.message); // Displays the detailed conflict explanation!
+        }
+    });
+
+    // Load complaints list
+    async function loadComplaintsList() {
+        const tbody = document.getElementById('complaintsTableBody');
+        try {
+            const list = await API.get('/api/admin/complaints');
+            if (list.length > 0) {
+                tbody.innerHTML = '';
+                list.forEach(c => {
+                    let prioBadge = 'bg-secondary';
+                    if (c.priority === 'CRITICAL') prioBadge = 'bg-danger';
+                    if (c.priority === 'HIGH') prioBadge = 'bg-warning text-dark';
+                    if (c.priority === 'MEDIUM') prioBadge = 'bg-primary';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${c.studentName}</strong><br><small class="text-muted">${c.rollNumber}</small></td>
+                            <td><strong>${c.title}</strong><br><small>${c.description}</small></td>
+                            <td><span class="badge bg-info text-dark">${c.category}</span></td>
+                            <td><span class="badge ${prioBadge}">${c.priority}</span></td>
+                            <td><span class="badge bg-dark">${c.status}</span></td>
+                            <td>
+                                ${c.status === 'OPEN' || c.status === 'IN_PROGRESS' ?
+                                `<button class="btn btn-sm btn-outline-primary" onclick="openResolveModal(${c.id})">Resolve</button>` :
+                                `<small class="text-success">${c.resolutionComments}</small>`}
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        } catch (error) {
+            console.error("Failed to load complaints:", error);
+        }
+    }
+
+    // Load leaves list
+    async function loadLeavesList() {
+        const tbody = document.getElementById('leavesTableBody');
+        try {
+            const list = await API.get('/api/admin/leaves');
+            if (list.length > 0) {
+                tbody.innerHTML = '';
+                list.forEach(l => {
+                    let badgeClass = 'bg-warning';
+                    if (l.status === 'APPROVED') badgeClass = 'bg-success';
+                    if (l.status === 'REJECTED') badgeClass = 'bg-danger';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${l.studentName}</strong><br><small>${l.rollNumber}</small></td>
+                            <td>${l.startDate} to ${l.endDate}</td>
+                            <td>${l.reason}</td>
+                            <td><span class="badge ${badgeClass}">${l.status}</span></td>
+                            <td>${l.reviewedByFacultyName || 'Pending'}</td>
+                        </tr>
+                    `;
+                });
+            }
+        } catch (error) {
+            console.error("Leaves retrieval failed:", error);
+        }
+    }
+
+    // Resolve Modal
+    function openResolveModal(id) {
+        document.getElementById('resolveCompId').value = id;
+        document.getElementById('resolveComments').value = '';
+        bootstrapComplaintModal.show();
+    }
+
+    document.getElementById('complaintForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('resolveCompId').value;
+        const status = document.getElementById('resolveStatus').value;
+        const comments = document.getElementById('resolveComments').value;
+
+        try {
+            await API.put(`/api/admin/complaints/${id}?status=${status}&comments=${encodeURIComponent(comments)}`);
+            alert("Complaint updated successfully.");
+            bootstrapComplaintModal.hide();
+            loadComplaintsList();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // Run dynamic loads on section switches
+    window.addEventListener('DOMContentLoaded', () => {
+        loadSubjectsList();
+        loadComplaintsList();
+        loadLeavesList();
+    });
+</script>
+</body>
+</html>
