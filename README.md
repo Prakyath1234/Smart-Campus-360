@@ -63,6 +63,22 @@ C:\tools\apache-maven-3.9.9\bin\mvn.cmd clean test
 
 ---
 
+## 🐳 Containerization & Production Deployment
+
+### Local Docker Deployment
+Run the complete containerized environment locally using one command:
+```powershell
+docker compose up --build
+```
+This runs the frontend Nginx (port `80`), Spring Boot backend (port `8080`), and MySQL 8.0 server with isolated LibreOffice conversion pipelines.
+
+### Render Cloud Deployment
+For cloud production setup using Render, refer to the Blueprint configuration:
+- Blueprint schema: [`render.yaml`](file:///f:/360/Smart-Campus-360/render.yaml)
+- Deployment instructions: [docs/render-deployment.md](file:///f:/360/Smart-Campus-360/docs/render-deployment.md)
+
+---
+
 ## 📚 Technical Documentation Suite
 
 - [docs/architecture-review.md](file:///f:/360/Smart-Campus-360/docs/architecture-review.md): System architecture, layer decomposition, and access control matrix.
@@ -73,3 +89,5 @@ C:\tools\apache-maven-3.9.9\bin\mvn.cmd clean test
 - [docs/testing-strategy.md](file:///f:/360/Smart-Campus-360/docs/testing-strategy.md): Automated testing design and coverage details.
 - [docs/interview-notes.md](file:///f:/360/Smart-Campus-360/docs/interview-notes.md): Answer guide to the 15 technical interview prep questions.
 - [docs/final-verification-report.md](file:///f:/360/Smart-Campus-360/docs/final-verification-report.md): Summary report of final verification across all 20 phases.
+- [docs/docker-deployment.md](file:///f:/360/Smart-Campus-360/docs/docker-deployment.md): Docker Compose architecture and parameters.
+- [docs/render-deployment.md](file:///f:/360/Smart-Campus-360/docs/render-deployment.md): Render deployment and services mapping.

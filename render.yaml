@@ -1,0 +1,62 @@
+services:
+  # MySQL Private Service
+  - type: pserv
+    name: smart-campus-mysql
+    env: docker
+    image: mysql:8.0
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 5
+    envVars:
+      - key: MYSQL_DATABASE
+        value: smart_campus_360
+      - key: MYSQL_USER
+        value: smart_user
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+
+  # Backend Web Service
+  - type: web
+    name: smart-campus-backend
+    env: docker
+    rootDir: backend
+    dockerfilePath: Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: mysql
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: smart-campus-mysql
+          property: host
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        value: smart_campus_360
+      - key: DB_USERNAME
+        value: smart_user
+      - key: DB_PASSWORD
+        fromService:
+          type: pserv
+          name: smart-campus-mysql
+          property: envVar:MYSQL_PASSWORD
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SMARTTOOLS_LIBREOFFICE_PATH
+        value: /usr/bin/soffice
+
+  # Frontend Web Service
+  - type: web
+    name: smart-campus-frontend
+    env: docker
+    rootDir: frontend
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: BACKEND_URL
+        value: http://smart-campus-backend:8080
+      - key: NGINX_ENVSUBST_FILTER
+        value: BACKEND_URL
