@@ -1,24 +1,4 @@
 services:
-  # MySQL Private Service
-  - type: pserv
-    name: smart-campus-mysql
-    runtime: image
-    image:
-      url: docker.io/library/mysql:8.0
-    disk:
-      name: mysql-data
-      mountPath: /var/lib/mysql
-      sizeGB: 10
-    envVars:
-      - key: MYSQL_DATABASE
-        value: smart_campus_360
-      - key: MYSQL_USER
-        value: smart_user
-      - key: MYSQL_PASSWORD
-        generateValue: true
-      - key: MYSQL_ROOT_PASSWORD
-        generateValue: true
-
   # Backend Web Service
   - type: web
     name: smart-campus-backend
@@ -31,21 +11,17 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: mysql
       - key: DB_HOST
-        fromService:
-          type: pserv
-          name: smart-campus-mysql
-          property: host
+        sync: false
       - key: DB_PORT
         value: "3306"
       - key: DB_NAME
         value: smart_campus_360
       - key: DB_USERNAME
-        value: smart_user
+        sync: false
       - key: DB_PASSWORD
-        fromService:
-          type: pserv
-          name: smart-campus-mysql
-          envVarKey: MYSQL_PASSWORD
+        sync: false
+      - key: DB_SSL
+        value: "false"
       - key: JWT_SECRET
         generateValue: true
       - key: SMARTTOOLS_LIBREOFFICE_PATH

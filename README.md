@@ -63,19 +63,24 @@ C:\tools\apache-maven-3.9.9\bin\mvn.cmd clean test
 
 ---
 
-## 🐳 Containerization & Production Deployment
+## 🐳 Containerization & Deployment Modes
 
-### Local Docker Deployment
-Run the complete containerized environment locally using one command:
+### 💻 Local Docker Deployment (All-in-One Compose)
+Run the complete containerized environment locally using Docker Compose:
 ```powershell
 docker compose up --build
 ```
-This runs the frontend Nginx (port `80`), Spring Boot backend (port `8080`), and MySQL 8.0 server with isolated LibreOffice conversion pipelines.
+This spawns three containers:
+- **`smart-campus-frontend`**: Nginx serving React assets on port `80` and proxying API calls.
+- **`smart-campus-backend`**: Spring Boot API with isolated LibreOffice instance on port `8080`.
+- **`smart-campus-mysql`**: Local MySQL 8.0 instance on port `3306` with persistent storage.
 
-### Render Cloud Deployment
-For cloud production setup using Render, refer to the Blueprint configuration:
+### ☁️ Production Cloud Deployment (Render + External DB)
+To deploy the application to Render without paying for a Render-hosted database service:
+1. **Frontend + Backend**: Hosted on Render as Docker Web Services.
+2. **Database**: MySQL database hosted by any external MySQL-compatible database provider.
 - Blueprint schema: [`render.yaml`](file:///f:/360/Smart-Campus-360/render.yaml)
-- Deployment instructions: [docs/render-deployment.md](file:///f:/360/Smart-Campus-360/docs/render-deployment.md)
+- Detailed instructions: [docs/render-deployment.md](file:///f:/360/Smart-Campus-360/docs/render-deployment.md)
 
 ---
 
