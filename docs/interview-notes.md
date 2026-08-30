@@ -1,144 +1,112 @@
-# Smart Campus 360 - Technical Interview Guide & Preparation Notes
+# Smart Campus 360 - Technical Interview Prep & Core Concepts
 
-## Technical Architecture Q&A
-
-### 1. Why Java?
-Java offers high performance, strict compile-time type-safety, robust multithreading capabilities, and an active enterprise ecosystem, making it the standard choice for secure backends.
-
-### 2. Why Spring Boot?
-Spring Boot minimizes boilerplate configuration through starter dependencies and auto-configuration mechanisms, enabling fast prototyping and embedded server startup out-of-the-box.
-
-### 3. Why MySQL?
-MySQL is a proven, ACID-compliant relational database. Campus databases are highly structured (attendance records relate to students and courses), making transactional integrity and relational constraints vital.
-
-### 4. What is JPA & Hibernate?
-- **JPA (Jakarta Persistence API):** A specification defining Object-Relational Mapping (ORM) inside Java.
-- **Hibernate:** The default ORM engine implementation that translates Java objects to SQL statements at runtime.
-
-### 5. What is REST API?
-Representational State Transfer (REST) is an architectural style for design APIs using HTTP protocols (GET, POST, PUT, DELETE) transmitting JSON payloads.
-
-### 6. What is Dependency Injection?
-A design pattern where objects receive their dependencies from the Spring IoC container (using `@Autowired` or constructor injection) rather than instantiating them locally, promoting loose coupling.
-
-### 7. What is Spring Security & JWT?
-- **Spring Security:** A framework providing security filters for request authentication and role-based route authorizations.
-- **JWT (JSON Web Token):** A stateless token signed with a secret key containing claims (username, role) representing session status.
-
-### 8. Authentication vs. Authorization
-- **Authentication:** Verifying *who* the user is (e.g. login credentials check).
-- **Authorization:** Verifying *what* permissions the authenticated user has (e.g. `FACULTY` role allowed to mark attendance).
-
-### 9. Why BCrypt?
-BCrypt is a slow hashing algorithm that includes an auto-generated salt, protecting passwords from rainbow-table lookups and brute-force GPU attacks.
-
-### 10. Why DTO?
-Data Transfer Objects decouple the database schema (entities) from the public REST layer, preventing JSON recursive serialization issues and hiding internal schema structures.
-
-### 11. How does a request travel through the application?
-1. Browser hits URL with header `Authorization: Bearer <JWT>`.
-2. `JwtAuthenticationFilter` interceptor extracts and validates the token.
-3. Security context is populated with custom UserDetails.
-4. Controller matches route, parses DTO payload, and calls Service layer.
-5. Service executes business transactions, committing through JPA Repository.
-6. DB commits; controller formats returned DTOs to JSON.
-
-### 12. How does the Emergency SOS work?
-1. Student clicks SOS, browser extracts location coordinates.
-2. Request POSTs to `/api/emergency/sos`.
-3. Saved Alert triggers immediate notifications populated in Security/Admin inboxes.
+This guide contains detailed answers to the 15 technical interview questions covering backend design, database ORM, security, performance calculation, emergency handling, and full-stack integration.
 
 ---
 
-## 30 Potential Interview Questions & Answers
+### Q1. Explain CRUD in your project.
+**Answer**:
+CRUD stands for Create, Read, Update, and Delete. In Smart Campus 360, full production-quality CRUD is implemented for core modules: Users, Students, Faculty, Departments, and Subjects.
+- **Create**: REST `POST` endpoints accepting JSON DTOs validated with Bean Validation (`@Valid`) and encrypted passwords.
+- **Read**: REST `GET` endpoints returning DTOs with dynamic search, filtering, and Spring Data `Pageable` pagination.
+- **Update**: REST `PUT` and `PATCH` endpoints allowing partial or full record updates.
+- **Delete / Deactivate**: `DELETE` endpoints for physical removal and `PATCH /status` for soft deactivation (`enabled = false`), preserving historical attendance, grade, and leave audit trails.
 
-1. **How does Spring Boot resolve active profiles?**
-   By passing `-Dspring.profiles.active=h2` during startup, it overrides standard values with configuration keys in `application-h2.properties`.
-   
-2. **What does `@Transactional` do?**
-   It defines transaction boundaries. If any runtime exception is thrown during execution, database changes are automatically rolled back.
+---
 
-3. **How do you prevent SQL injection in JPA?**
-   JPA uses parameterized queries by default (prepared statements), preventing raw SQL concatenation and sanitizing inputs.
+### Q2. Why use DTOs (Data Transfer Objects)?
+**Answer**:
+1. **Security**: Prevents returning sensitive fields like password hashes to the client.
+2. **Decoupling**: Decouples internal database schemas from external API contracts.
+3. **Prevent Infinite Recursion**: Prevents infinite JSON serialization loops caused by bi-directional JPA relationships (`@ManyToOne` / `@OneToMany`).
+4. **Prevent `LazyInitializationException`**: Controls exactly which fields are serialized before closing transactional sessions.
 
-4. **Why choose constructor injection over field injection?**
-   Constructor injection facilitates immutability (`final` fields) and allows easy unit testing since mock services can be passed directly to constructors.
+---
 
-5. **How does JWT verification avoid database queries?**
-   By validating the cryptographic signature using the shared secret key. If the signature matches, the claims (role, email) are trusted without hitting the DB.
+### Q3. Why use a Service layer?
+**Answer**:
+The Service layer isolates business logic from HTTP transport concerns in Controllers. It manages database transactions (`@Transactional`), coordinates multiple repositories, enforces authorization checks, and performs calculations (such as timetable conflict detection or grade computation).
 
-6. **What is `@RestControllerAdvice`?**
-   A global interceptor that handles exceptions thrown by any Controller and maps them to clean JSON responses.
+---
 
-7. **How does Lombok work?**
-   Lombok processes annotations (like `@Data`) during compile time and injects getters, setters, and constructors directly into the bytecode.
+### Q4. Why use a Repository layer?
+**Answer**:
+The Repository layer abstracts data access. By extending `JpaRepository` and `JpaSpecificationExecutor`, Spring Data JPA automatically generates implementation classes at runtime for standard SQL queries, dynamic criteria searching, and pagination without writing boilerplate JDBC code.
 
-8. **What is the difference between `ddl-auto=update` and `create-drop`?**
-   `update` updates tables as JPA schema matches without erasing existing records. `create-drop` drops tables on shutdown (ideal for tests).
+---
 
-9. **What is CORS?**
-   Cross-Origin Resource Sharing is a browser mechanism that blocks web applications hosted on one origin (e.g., file system / port 3000) from requesting resources on another (e.g., port 8080) unless explicit headers are set.
+### Q5. How does JPA work?
+**Answer**:
+JPA (Java Persistence API) is a standard ORM specification that maps Java classes (Entities) to relational database tables. Annotations like `@Entity`, `@Table`, `@Id`, and `@Column` define table schemas.
 
-10. **Explain how timetable conflicts are checked.**
-    Queries scan slots in the database matching the requested day, searching for overlapping time ranges for the same classroom, faculty, or section/semester.
+---
 
-11. **How do you handle password salts?**
-    BCrypt embeds the salt inside the final hashed output string, eliminating the need to store salts in a separate column.
+### Q6. How does Hibernate map entities?
+**Answer**:
+Hibernate is the ORM provider implementing JPA. It translates Java object operations (like `repository.save(student)`) into native SQL queries (`INSERT`, `UPDATE`, `SELECT`, `DELETE`), manages persistence contexts, and maintains first-level entity caching.
 
-12. **Why use H2 database during testing?**
-    H2 runs in-memory, requiring zero installation, making it extremely fast for integration testing without polluting MySQL.
+---
 
-13. **What is the role of `OncePerRequestFilter`?**
-    It ensures that a security filter runs exactly once per servlet request, preventing redundant executions in nested dispatches.
+### Q7. How do you prevent duplicate data?
+**Answer**:
+1. **Database Constraints**: Table columns use unique constraints (`@Column(unique = true)` on `email`, `rollNumber`, `employeeId`, `code`).
+2. **Service Layer Validation**: Service methods invoke `repository.existsByEmail(...)` or `existsByRollNumber(...)` and throw a `BadRequestException` (`HTTP 400`) before saving duplicate records.
 
-14. **What is the use of `@Column(nullable = false)`?**
-    It sets database column constraints to `NOT NULL` during DDL creation, acting as a secondary validation layer.
+---
 
-15. **What is Jakarta Bean Validation?**
-    A specification that checks properties (e.g., `@Email`, `@NotBlank`) on controllers before processing request payloads.
+### Q8. How does pagination work?
+**Answer**:
+Using Spring Data `Pageable` and `PageRequest.of(page, size, Sort)`. Repositories execute a SQL `COUNT` query followed by a paginated `SELECT` query using `LIMIT` and `OFFSET` (or `FETCH FIRST / OFFSET` in H2).
 
-16. **Why do we use `@CreationTimestamp`?**
-    It allows Hibernate to automatically set timestamps when inserting new records, simplifying audit trails.
+---
 
-17. **What is the use of `WebSecurityConfigurerAdapter` in Spring Security 6?**
-    It is deprecated. Security filters are now configured using a `SecurityFilterChain` bean.
+### Q9. How does JWT authentication work?
+**Answer**:
+1. User logs in at `/api/auth/login` with email and password.
+2. Server verifies password hash with `BCryptPasswordEncoder` and returns a signed JWT token containing email and role claims.
+3. Client stores JWT in `localStorage` and includes header `Authorization: Bearer <token>` on requests.
+4. `JwtAuthenticationFilter` intercepts requests, validates the signature, extracts the user's email, and sets `SecurityContextHolder.getContext().setAuthentication(...)`.
 
-18. **How does the AI Classifier categorize complaints?**
-    Through keyword lookup strings matching categories. E.g. "leak" matches `MAINTENANCE` and "wire" matches `SAFETY` with `CRITICAL` priority.
+---
 
-19. **What are JPA relationship fetch types?**
-    - `LAZY`: Mapped values are loaded on demand.
-    - `EAGER`: Related tables are joined and loaded immediately.
+### Q10. How do you prevent one student accessing another student's data (IDOR protection)?
+**Answer**:
+Instead of accepting arbitrary student IDs in path variables for personal data endpoints (e.g. `/api/student/profile`), endpoints derive identity dynamically from the authenticated JWT `Principal` (`principal.getName()`). This makes IDOR attacks impossible because students can only fetch records linked to their authenticated identity.
 
-20. **Why avoid bidirectional `@ManyToMany` in REST entities?**
-    It can trigger infinite JSON loops during serialization. Decoupling via DTOs resolves this completely.
+---
 
-21. **What is stateless session management?**
-    The server does not store user session data on memory. Each request must carry credentials (JWT), enabling easier horizontal scaling.
+### Q11. How does timetable conflict detection work?
+**Answer**:
+Before saving a new timetable slot, `AcademicService` checks:
+1. **Classroom Overlap**: `timetableRepository.findByDayOfWeekAndClassroom(...)` ensures no two classes occupy the same room at overlapping times.
+2. **Semester Conflict**: `timetableRepository.findByDayOfWeekAndSemesterAndDepartmentId(...)` ensures students in the same semester/department do not have overlapping lectures.
 
-22. **What is the purpose of `@ResponseStatus`?**
-    It maps a custom Java exception to a specific HTTP status code, such as `404 NOT FOUND`.
+---
 
-23. **What is a MockMvc?**
-    A Spring Boot test class tool that mocks HTTP requests to REST controllers without booting a full servlet container.
+### Q12. How is student performance calculated?
+**Answer**:
+`PerformanceAnalyticsService` computes:
+- **Attendance Rate**: `(presentClasses / totalClasses) * 100.0`
+- **Average Marks**: Average of total subject scores (internal + assignment + exam)
+- **Risk Status Engine**: Evaluates configurable rules. If `attendancePercentage < 75%` OR `averageMarks < 50`, the student is flagged as `AT_RISK` with an explicit reason string; otherwise `GOOD`.
 
-24. **How do you structure validation errors?**
-    `GlobalExceptionHandler` intercepts validation failures and returns a map of field names to their specific error messages.
+---
 
-25. **Why Decouple User from Student/Faculty?**
-    It allows general users (like administrators and security staff) to exist without requiring academic fields like roll numbers.
+### Q13. How does SOS work?
+**Answer**:
+1. Student clicks "TRIGGER SOS" on web dashboard.
+2. Browser fetches optional HTML5 Geolocation coordinates (`latitude`, `longitude`).
+3. Request posts to `/api/emergency/trigger`.
+4. Server creates `EmergencyAlert` (status `ACTIVE`), sends instant notifications to all Security & Admin users, and records telemetry.
 
-26. **What is `createDatabaseIfNotExist=true` query parameter?**
-    It tells the MySQL driver to automatically run a DB initialization command if the schema database doesn't exist yet.
+---
 
-27. **What does Hibernate `@GeneratedValue` do?**
-    Delegates primary key sequence increment operations to the database (using `AUTO_INCREMENT` in MySQL).
+### Q14. How are exceptions handled?
+**Answer**:
+`GlobalExceptionHandler` (`@RestControllerAdvice`) intercepts all runtime exceptions (`ResourceNotFoundException`, `BadRequestException`, `AccessDeniedException`) and maps them to clean JSON payloads with appropriate HTTP status codes (`400`, `401`, `403`, `404`, `409`, `500`).
 
-28. **How do you configure CORS in Spring Security?**
-    By registering a `CorsConfigurationSource` bean allowing methods (GET, POST) and headers (Authorization) from client origins.
+---
 
-29. **What does `POM` stand for in Maven?**
-    Project Object Model. It defines build directories, versions, plugins, and dependencies.
-
-30. **Explain how notifications are routed.**
-    Upon creating events (like leave requests), the system fetches appropriate recipients and registers rows in the notification table. The client polls or pulls notifications on reload.
+### Q15. How does React communicate with Spring Boot?
+**Answer**:
+React uses standard `fetch()` API calls defined in `frontend/src/api/index.js`. Vite dev server proxies `/api` requests to Spring Boot on `localhost:8080`. In production builds, React static assets (`index.html`, `assets/`) are compiled into `backend/src/main/resources/static` and served directly by Spring Boot.

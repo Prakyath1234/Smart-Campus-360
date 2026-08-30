@@ -14,7 +14,7 @@ Endpoints grouped under `/api/auth` do not require JWT authorization headers (pu
   ```json
   {
     "name": "John Doe",
-    "email": "student@smartcampus.com",
+    "email": "student@sode-edu.in",
     "password": "password123",
     "phone": "9876543212",
     "role": "STUDENT",
@@ -27,7 +27,7 @@ Endpoints grouped under `/api/auth` do not require JWT authorization headers (pu
   ```json
   {
     "token": "eyJhbGciOi...",
-    "email": "student@smartcampus.com",
+    "email": "student@sode-edu.in",
     "role": "STUDENT",
     "name": "John Doe",
     "userId": 3,
@@ -41,7 +41,7 @@ Endpoints grouped under `/api/auth` do not require JWT authorization headers (pu
 * **Request Body:**
   ```json
   {
-    "email": "student@smartcampus.com",
+    "email": "student@sode-edu.in",
     "password": "password"
   }
   ```

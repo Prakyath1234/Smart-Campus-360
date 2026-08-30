@@ -2,12 +2,12 @@ USE smart_campus_360;
 
 -- Hashed BCrypt password for the string 'password': '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92'
 
--- 1. Insert Users (Admin, Faculty, Student, Security)
+-- 1. Insert Users (Admin, Faculty, Student, Security) with sode-edu.in domain
 INSERT INTO users (id, name, email, password, phone, role, enabled) VALUES
-(1, 'System Administrator', 'admin@smartcampus.com', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543210', 'ADMIN', TRUE),
-(2, 'Dr. Sarah Jenkins', 'faculty@smartcampus.com', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543211', 'FACULTY', TRUE),
-(3, 'John Doe', 'student@smartcampus.com', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543212', 'STUDENT', TRUE),
-(4, 'Officer Chief Davis', 'security@smartcampus.com', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543213', 'SECURITY', TRUE);
+(1, 'System Administrator', 'admin@sode-edu.in', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543210', 'ADMIN', TRUE),
+(2, 'Dr. Sarah Jenkins', 'faculty@sode-edu.in', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543211', 'FACULTY', TRUE),
+(3, 'John Doe', 'student@sode-edu.in', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543212', 'STUDENT', TRUE),
+(4, 'Officer Chief Davis', 'security@sode-edu.in', '$2a$10$8.Eng5rx3TvFnfiWd3F3c.E1s9u5V1.2NfJkC4h/K3Gcr3P5N6w92', '9876543213', 'SECURITY', TRUE);
 
 -- 2. Insert Departments
 INSERT INTO departments (id, name, code) VALUES

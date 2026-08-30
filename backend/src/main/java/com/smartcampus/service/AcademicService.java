@@ -18,6 +18,7 @@ public class AcademicService {
 
     private final DepartmentRepository departmentRepository;
     private final StudentRepository studentRepository;
+    private final UserRepository userRepository;
     private final FacultyRepository facultyRepository;
     private final SubjectRepository subjectRepository;
     private final AttendanceRepository attendanceRepository;
@@ -26,11 +27,13 @@ public class AcademicService {
     private final NotificationService notificationService;
 
     public AcademicService(DepartmentRepository departmentRepository, StudentRepository studentRepository,
-                           FacultyRepository facultyRepository, SubjectRepository subjectRepository,
-                           AttendanceRepository attendanceRepository, MarksRepository marksRepository,
-                           TimetableRepository timetableRepository, NotificationService notificationService) {
+                           UserRepository userRepository, FacultyRepository facultyRepository, 
+                           SubjectRepository subjectRepository, AttendanceRepository attendanceRepository, 
+                           MarksRepository marksRepository, TimetableRepository timetableRepository, 
+                           NotificationService notificationService) {
         this.departmentRepository = departmentRepository;
         this.studentRepository = studentRepository;
+        this.userRepository = userRepository;
         this.facultyRepository = facultyRepository;
         this.subjectRepository = subjectRepository;
         this.attendanceRepository = attendanceRepository;
@@ -63,6 +66,21 @@ public class AcademicService {
         Student student = studentRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student profile not found"));
         return mapToStudentDto(student);
+    }
+
+    public StudentDto getStudentByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        Student student = studentRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Student profile not found for user: " + email));
+        return mapToStudentDto(student);
+    }
+
+    public Student getStudentEntityByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        return studentRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Student profile not found for user: " + email));
     }
 
     public List<StudentDto> getAllStudents() {

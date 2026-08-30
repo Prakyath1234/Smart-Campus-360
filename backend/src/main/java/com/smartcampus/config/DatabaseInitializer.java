@@ -18,29 +18,35 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final FacultyRepository facultyRepository;
     private final SubjectRepository subjectRepository;
     private final TimetableRepository timetableRepository;
+    private final MentorshipRepository mentorshipRepository;
+    private final ServiceRequestRepository serviceRequestRepository;
+    private final AnnouncementRepository announcementRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DatabaseInitializer(UserRepository userRepository, DepartmentRepository departmentRepository,
                                StudentRepository studentRepository, FacultyRepository facultyRepository,
                                SubjectRepository subjectRepository, TimetableRepository timetableRepository,
-                               PasswordEncoder passwordEncoder) {
+                               MentorshipRepository mentorshipRepository, ServiceRequestRepository serviceRequestRepository,
+                               AnnouncementRepository announcementRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.studentRepository = studentRepository;
         this.facultyRepository = facultyRepository;
         this.subjectRepository = subjectRepository;
         this.timetableRepository = timetableRepository;
+        this.mentorshipRepository = mentorshipRepository;
+        this.serviceRequestRepository = serviceRequestRepository;
+        this.announcementRepository = announcementRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) throws Exception {
         if (userRepository.count() > 0) {
-            // Database already initialized
             return;
         }
 
-        System.out.println("Initializing default database records (Departments, Users, Subjects, Timetables)...");
+        System.out.println("Initializing default database records with @sode-edu.in domain...");
 
         // 1. Create Departments
         Department cse = Department.builder().name("Computer Science and Engineering").code("CSE").build();
@@ -51,13 +57,12 @@ public class DatabaseInitializer implements CommandLineRunner {
         ece = departmentRepository.save(ece);
         me = departmentRepository.save(me);
 
-        // Hashed BCrypt password for string 'password'
         String hashedPassword = passwordEncoder.encode("password");
 
-        // 2. Create Users
+        // 2. Create Users with sode-edu.in domain
         User adminUser = User.builder()
                 .name("System Administrator")
-                .email("admin@smartcampus.com")
+                .email("admin@sode-edu.in")
                 .password(hashedPassword)
                 .phone("9876543210")
                 .role(Role.ADMIN)
@@ -67,7 +72,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         User facultyUser = User.builder()
                 .name("Dr. Sarah Jenkins")
-                .email("faculty@smartcampus.com")
+                .email("faculty@sode-edu.in")
                 .password(hashedPassword)
                 .phone("9876543211")
                 .role(Role.FACULTY)
@@ -76,7 +81,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         User studentUser = User.builder()
                 .name("John Doe")
-                .email("student@smartcampus.com")
+                .email("student@sode-edu.in")
                 .password(hashedPassword)
                 .phone("9876543212")
                 .role(Role.STUDENT)
@@ -85,7 +90,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         User securityUser = User.builder()
                 .name("Officer Chief Davis")
-                .email("security@smartcampus.com")
+                .email("security@sode-edu.in")
                 .password(hashedPassword)
                 .phone("9876543213")
                 .role(Role.SECURITY)
@@ -101,7 +106,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .semester(5)
                 .enrollmentDate(LocalDate.now())
                 .build();
-        studentRepository.save(student);
+        student = studentRepository.save(student);
 
         // 4. Create Faculty Profile
         Faculty faculty = Faculty.builder()
@@ -141,6 +146,35 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .semester(5)
                 .build();
         timetableRepository.save(t2);
+
+        // 7. Seed Mentorship
+        Mentorship mentorship = Mentorship.builder()
+                .mentor(faculty)
+                .mentee(student)
+                .build();
+        mentorshipRepository.save(mentorship);
+
+        // 8. Seed Service Request
+        ServiceRequest req = ServiceRequest.builder()
+                .student(student)
+                .requestType("ID_CARD")
+                .title("Replacement Smart Campus ID Card Request")
+                .description("Damaged barcode on my student badge, request reissue.")
+                .status("PENDING")
+                .build();
+        serviceRequestRepository.save(req);
+
+        // 9. Seed Announcement
+        Announcement ann = Announcement.builder()
+                .title("Mid-Semester Academic Evaluation & Exam Schedule")
+                .content("All Semester 5 CSE students are requested to report to Hall B for internal lab evaluations.")
+                .targetAudience("ALL_STUDENTS")
+                .targetDepartment(cse)
+                .targetSemester(5)
+                .authorName("Dr. Sarah Jenkins")
+                .published(true)
+                .build();
+        announcementRepository.save(ann);
 
         System.out.println("Database initialization complete.");
     }

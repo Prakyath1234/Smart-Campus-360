@@ -1,87 +1,75 @@
-# Smart Campus 360
+# Smart Campus 360 - Enterprise Campus Management & Safety Telemetry Platform
 
-Smart Campus Management &amp; Emergency Response System
-
----
-
-## Description
-**Smart Campus 360** is a college management and emergency response system. It provides students, faculty members, administrators, and security staff with a unified workspace, integrating academic logs (grades, scheduling, attendance) with real-time distress signals (SOS emergency alerts).
-
-## Problem Statement
-Traditional campuses operate with fragmented systems. Academic grades, schedules, and attendance logs are separated from critical facility safety response mechanisms. In critical situations (e.g. fire hazards, medical collapses), student coordinate reporting is slow, causing delays in response.
-
-## Objectives
-1. **Unify Operations:** Consolidate class schedules, marks, attendance logs, and leave requests into one dashboard.
-2. **Swift Safety Response:** Implement a high-priority SOS emergency alert system utilizing browser geolocations to notify security staff instantly.
-3. **AI Integration:** Leverage automated keyword NLP classification to route complaints to appropriate categories and priority channels.
-
-## User Roles
-* **STUDENT:** View attendance, marks, schedules. Submit leaves, complaints, and trigger SOS.
-* **FACULTY:** Record attendance logs, update grades, and review leave requests.
-* **ADMIN:** Complete dashboard stats, register departments, assign subjects, add timetables, and resolve complaints.
-* **SECURITY:** Live SOS telemetry feed with student contact details and toggle response workflow controls.
-
-## Technology Stack
-* **Backend:** Java 21, Spring Boot 3.3.x, Spring Data JPA, Spring Security, JWT (HMAC-SHA), Lombok, Jakarta Validation.
-* **Database:** MySQL 8.0, H2 Database (in-memory test fallback).
-* **Frontend:** Responsive HTML5, CSS3, JavaScript (Fetch API, local storage), Bootstrap 5.
-* **Testing:** JUnit 5, Mockito.
+**Smart Campus 360** is an enterprise-grade campus management and emergency response telemetry platform built with **Spring Boot 3.3.x (Java 21)** and **React 18** (Glassmorphic Dark UI + Framer Motion).
 
 ---
 
-## Architecture
-The application implements a clean layered architecture pattern:
-```
-Frontend (Bootstrap 5 / Vanilla JS Fetch)
-       ↓
-REST Controller Layer
-       ↓
-Service Layer (Business Logic & AI Classifier)
-       ↓
-Repository Layer (Spring Data JPA)
-       ↓
-Database Layer (H2 / MySQL)
-```
+## 🌟 Key Platform Features
+
+### 🎓 1. Academic & Student Management
+- **Student Workspace**: Profile details, real-time attendance rate calculation, subject-wise internal/exam mark breakdown, and class schedules.
+- **Student Performance Analytics & Risk Engine**: Evaluates attendance (<75%) and academic scores (<50 avg) to flag `AT_RISK` students with explicit reasons.
+- **Faculty Mentorship & Counseling**: Faculty-mentee mapping with private counseling notes (`ACADEMIC`, `PERSONAL`, `DISCIPLINARY`, `CAREER`).
+
+### 🏛️ 2. Administrative Operations & Full CRUD
+- **User & Role Management**: Search, filter (role, status), and paginate user accounts with soft deactivation (`enabled = false`).
+- **Student & Faculty Management**: Roll number and employee ID tracking with department/semester filters.
+- **Department & Subject Registry**: Conflict-checked timetable scheduler preventing classroom and semester slot collisions.
+- **Campus Service Requests**: Ticket submission and processing for ID cards, bonafide certificates, hostel maintenance, and fee receipts.
+
+### 🛡️ 3. Emergency SOS Response & Security Center
+- **SOS Telemetry Feed**: Live incident feed with emergency types (`MEDICAL`, `FIRE`, `SECURITY`, `ACCIDENT`).
+- **GPS Coordinates & Google Maps Link**: Transmits HTML5 GPS latitude/longitude with fallback location text if permission is denied.
+- **Enforced State Machine Workflow**: Strict status transition validation (`ACTIVE` → `ACKNOWLEDGED` → `IN_PROGRESS` → `RESOLVED` / `CANCELLED`).
+- **Telemetry Analytics**: Response time calculations, type distribution, and resolved count metrics.
+
+### 📜 4. Auditability, Status History & Reports
+- **Append-Only Audit Logs**: Immutable log records (`USER_CREATED`, `MARKS_UPDATED`, `LEAVE_APPROVED`, `SOS_TRIGGERED`, `SOS_RESOLVED`) queryable by Admin (`GET /api/admin/audit-logs`).
+- **Status History Tracking**: Audit trails for status changes across Complaints, Leaves, Service Requests, and Emergency Alerts.
+- **CSV Reporting Engine**: Export downloadable CSV reports for students, attendance, marks, complaints, leaves, emergencies, and service requests.
 
 ---
 
-## Installation & Setup
+## 🛠️ Technology Stack
 
-### 1. MySQL Setup
-Import the database scripts provided in the `database/` folder:
-```bash
-mysql -u root -p < database/schema.sql
-mysql -u root -p < database/sample-data.sql
-```
+- **Backend Framework**: Java 21, Spring Boot 3.3.3, Spring Security, JWT (Stateless Bearer Tokens), BCrypt.
+- **ORM & Data Access**: Spring Data JPA, Hibernate ORM 6.5, Jakarta Validation.
+- **Database Support**: H2 (In-memory development profile) & MySQL 8.0 (Persistent production profile).
+- **Frontend Framework**: React 18, Vite 8.2, Framer Motion, Lucide Icons, Vanilla CSS (Glassmorphism aesthetics).
+- **Testing & QA**: JUnit 5, Spring Boot Test, Mockito.
 
-### 2. Backend Setup
-Set environment variables if customizing credentials:
-- `DB_USERNAME` (Default: `root`)
-- `DB_PASSWORD` (Default: empty)
-- `JWT_SECRET` (Default: secure fallback key)
+---
 
-Compile and test:
-```bash
+## ⚡ Quick Start Instructions
+
+### 1. Run Backend (H2 Profile)
+```powershell
 cd backend
-mvn clean test
+C:\tools\apache-maven-3.9.9\bin\mvn.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.profiles.active=h2"
 ```
 
-Start the server:
-```bash
-mvn spring-boot:run
+### 2. Run Frontend Dev Server
+```powershell
+cd frontend
+npm run dev
 ```
-For fallback zero-config H2 setup, start using:
-```bash
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=h2"
-```
+Open **`http://localhost:5173`** in your browser.
 
-### 3. Frontend Setup
-1. Launch the backend server (`http://localhost:8080`).
-2. Double click or serve `frontend/index.html` in any browser.
+### 3. Run Automated Test Suite
+```powershell
+cd backend
+C:\tools\apache-maven-3.9.9\bin\mvn.cmd clean test
+```
 
 ---
 
-## Future Enhancements
-* **WebSockets Integration:** Transition from polling to live WebSockets for instant, low-latency SOS alarm dispatching.
-* **Google Maps Maps API:** Embed interactive location pins rather than linking to external Google Maps navigation lines.
-* **Third-Party Email Dispatch:** Integrate SendGrid/Amazon SES to issue copy leave logs and grade report cards.
+## 📚 Technical Documentation Suite
+
+- [docs/architecture-review.md](file:///f:/360/Smart-Campus-360/docs/architecture-review.md): System architecture, layer decomposition, and access control matrix.
+- [docs/api-contract.md](file:///f:/360/Smart-Campus-360/docs/api-contract.md): Complete REST API contract specifications.
+- [docs/crud-guide.md](file:///f:/360/Smart-Campus-360/docs/crud-guide.md): Detailed breakdown of CRUD layers and validation.
+- [docs/security-review.md](file:///f:/360/Smart-Campus-360/docs/security-review.md): Security hardening, JWT authentication, and IDOR prevention controls.
+- [docs/audit-log.md](file:///f:/360/Smart-Campus-360/docs/audit-log.md): Append-only audit logging system reference.
+- [docs/testing-strategy.md](file:///f:/360/Smart-Campus-360/docs/testing-strategy.md): Automated testing design and coverage details.
+- [docs/interview-notes.md](file:///f:/360/Smart-Campus-360/docs/interview-notes.md): Answer guide to the 15 technical interview prep questions.
+- [docs/final-verification-report.md](file:///f:/360/Smart-Campus-360/docs/final-verification-report.md): Summary report of final verification across all 20 phases.

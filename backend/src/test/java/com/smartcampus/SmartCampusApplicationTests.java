@@ -57,7 +57,7 @@ class SmartCampusApplicationTests {
     void testUserRegistrationAndLogin() {
         RegisterRequest register = new RegisterRequest();
         register.setName("Test Student");
-        register.setEmail("teststudent@smartcampus.com");
+        register.setEmail("teststudent@sode-edu.in");
         register.setPassword("password123");
         register.setRole("STUDENT");
         register.setRollNumber("ROLL999");
@@ -67,11 +67,11 @@ class SmartCampusApplicationTests {
         AuthResponse regResponse = authService.register(register);
         assertNotNull(regResponse);
         assertNotNull(regResponse.getToken());
-        assertEquals("teststudent@smartcampus.com", regResponse.getEmail());
+        assertEquals("teststudent@sode-edu.in", regResponse.getEmail());
         assertEquals("STUDENT", regResponse.getRole());
 
         // Test login
-        AuthRequest login = new AuthRequest("teststudent@smartcampus.com", "password123");
+        AuthRequest login = new AuthRequest("teststudent@sode-edu.in", "password123");
         AuthResponse loginResponse = authService.login(login);
         assertNotNull(loginResponse);
         assertEquals(regResponse.getToken().substring(0, 10), loginResponse.getToken().substring(0, 10)); // simple token similarity check
