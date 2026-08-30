@@ -45,7 +45,7 @@ services:
         fromService:
           type: pserv
           name: smart-campus-mysql
-          property: envVar:MYSQL_PASSWORD
+          envVarKey: MYSQL_PASSWORD
       - key: JWT_SECRET
         generateValue: true
       - key: SMARTTOOLS_LIBREOFFICE_PATH
