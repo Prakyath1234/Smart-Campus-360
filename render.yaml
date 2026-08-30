@@ -2,12 +2,13 @@ services:
   # MySQL Private Service
   - type: pserv
     name: smart-campus-mysql
-    env: docker
-    image: mysql:8.0
+    runtime: image
+    image:
+      url: docker.io/library/mysql:8.0
     disk:
       name: mysql-data
       mountPath: /var/lib/mysql
-      sizeGB: 5
+      sizeGB: 10
     envVars:
       - key: MYSQL_DATABASE
         value: smart_campus_360
@@ -21,9 +22,10 @@ services:
   # Backend Web Service
   - type: web
     name: smart-campus-backend
-    env: docker
+    runtime: docker
     rootDir: backend
-    dockerfilePath: Dockerfile
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
@@ -52,11 +54,15 @@ services:
   # Frontend Web Service
   - type: web
     name: smart-campus-frontend
-    env: docker
+    runtime: docker
     rootDir: frontend
-    dockerfilePath: Dockerfile
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: BACKEND_URL
-        value: http://smart-campus-backend:8080
+        fromService:
+          type: web
+          name: smart-campus-backend
+          property: hostport
       - key: NGINX_ENVSUBST_FILTER
         value: BACKEND_URL
