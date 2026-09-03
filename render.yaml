@@ -1,11 +1,9 @@
 services:
-  # Backend Web Service
   - type: web
     name: smart-campus-backend
     runtime: docker
-    rootDir: backend
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
@@ -27,13 +25,11 @@ services:
       - key: SMARTTOOLS_LIBREOFFICE_PATH
         value: /usr/bin/soffice
 
-  # Frontend Web Service
   - type: web
     name: smart-campus-frontend
     runtime: docker
-    rootDir: frontend
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
     envVars:
       - key: BACKEND_URL
         fromService:
