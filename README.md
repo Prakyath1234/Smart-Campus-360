@@ -4,6 +4,17 @@
 
 ---
 
+## 🌐 Live Production Deployments
+
+| Component | Platform | Live URL / Endpoint |
+|---|---|---|
+| **Production Frontend** | **Vercel** | [https://smart-campus-360-sandy.vercel.app](https://smart-campus-360-sandy.vercel.app) |
+| **Production Backend** | **Render** | [https://smart-campus-backend-8v6m.onrender.com](https://smart-campus-backend-8v6m.onrender.com) |
+| **Backend Health Check** | **Render Actuator** | [https://smart-campus-backend-8v6m.onrender.com/actuator/health](https://smart-campus-backend-8v6m.onrender.com/actuator/health) |
+| **Database Instance** | **Aiven MySQL** | Managed Cloud MySQL 8.0 (SSL Enabled) |
+
+---
+
 ## 🌟 Key Platform Features
 
 ### 🎓 1. Academic & Student Management
@@ -75,10 +86,10 @@ This spawns three containers:
 - **`smart-campus-backend`**: Spring Boot API with isolated LibreOffice instance on port `8080`.
 - **`smart-campus-mysql`**: Local MySQL 8.0 instance on port `3306` with persistent storage.
 
-### ☁️ Production Cloud Deployment (Render + External DB)
-To deploy the application to Render without paying for a Render-hosted database service:
-1. **Frontend + Backend**: Hosted on Render as Docker Web Services.
-2. **Database**: MySQL database hosted by any external MySQL-compatible database provider.
+### ☁️ Production Cloud Deployment (Vercel + Render + Aiven MySQL)
+- **Production Frontend**: Deployed on Vercel at [https://smart-campus-360-sandy.vercel.app](https://smart-campus-360-sandy.vercel.app)
+- **Production Backend**: Deployed on Render at [https://smart-campus-backend-8v6m.onrender.com](https://smart-campus-backend-8v6m.onrender.com)
+- **Production Database**: Hosted on Aiven Cloud Managed MySQL 8.0
 - Blueprint schema: [`render.yaml`](file:///f:/360/Smart-Campus-360/render.yaml)
 - Detailed instructions: [docs/render-deployment.md](file:///f:/360/Smart-Campus-360/docs/render-deployment.md)
 
