@@ -1,40 +1,15 @@
 services:
   - type: web
-    name: smart-campus-backend
+    name: smart-campus-360
     runtime: docker
+    plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: h2
-      - key: DB_HOST
-        sync: false
-      - key: DB_PORT
-        value: "3306"
-      - key: DB_NAME
-        value: smart_campus_360
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: DB_SSL
-        value: "false"
       - key: JWT_SECRET
         generateValue: true
       - key: SMARTTOOLS_LIBREOFFICE_PATH
         value: /usr/bin/soffice
-
-  - type: web
-    name: smart-campus-frontend
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
-    envVars:
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: smart-campus-backend
-          property: hostport
-      - key: NGINX_ENVSUBST_FILTER
-        value: BACKEND_URL
