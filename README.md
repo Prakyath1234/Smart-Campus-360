@@ -8,10 +8,22 @@
 
 | Component | Platform | Live URL / Endpoint |
 |---|---|---|
+| **Render Cloud Full-Stack** | **Render (Free Tier)** | Single Unified Service (Frontend + Backend) |
 | **Production Frontend** | **Vercel** | [https://smart-campus-360-sandy.vercel.app](https://smart-campus-360-sandy.vercel.app) |
-| **Production Backend** | **Render** | [https://smart-campus-backend-8v6m.onrender.com](https://smart-campus-backend-8v6m.onrender.com) |
-| **Backend Health Check** | **Render Actuator** | [https://smart-campus-backend-8v6m.onrender.com/actuator/health](https://smart-campus-backend-8v6m.onrender.com/actuator/health) |
-| **Database Instance** | **Aiven MySQL** | Managed Cloud MySQL 8.0 (SSL Enabled) |
+| **GitHub Repository** | **GitHub** | [https://github.com/Prakyath1234/Smart-Campus-360](https://github.com/Prakyath1234/Smart-Campus-360) |
+
+---
+
+## 🔑 Default Credentials
+
+| Role | Email | Password | Access |
+|---|---|---|---|
+| **Admin** | `admin@sode-edu.in` | `password` | Department & Subject CRUD, Audit Logs, Grievances |
+| **Security** | `security@sode-edu.in` | `password` | Live Campus-Only SOS Telemetry Feed & GPS |
+| **Faculty** | `faculty@sode-edu.in` | `password` | Student Attendance Marking, Marks, Mentees |
+| **Student** | `student@sode-edu.in` | `password` | Weekly Timetable, Attendance, Complaints, SOS |
+
+*(Password Reset is enabled on the Login card for any registered user via "Forgot Password?")*
 
 ---
 
