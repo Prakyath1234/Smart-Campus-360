@@ -7,7 +7,7 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: mysql
+        value: h2
       - key: DB_HOST
         sync: false
       - key: DB_PORT
