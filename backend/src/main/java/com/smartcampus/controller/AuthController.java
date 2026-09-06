@@ -39,4 +39,12 @@ public class AuthController {
     public ResponseEntity<List<Department>> getDepartments() {
         return ResponseEntity.ok(academicService.getAllDepartments());
     }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<java.util.Map<String, String>> resetPassword(@RequestBody java.util.Map<String, String> request) {
+        String email = request.get("email");
+        String newPassword = request.get("newPassword");
+        authService.resetPassword(email, newPassword);
+        return ResponseEntity.ok(java.util.Map.of("message", "Password reset successfully! You can now log in with your new password."));
+    }
 }

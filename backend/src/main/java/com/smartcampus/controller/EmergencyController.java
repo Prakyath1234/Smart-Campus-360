@@ -85,7 +85,7 @@ public class EmergencyController {
         return ResponseEntity.ok(emergencyAlertService.updateAlertStatus(id, "CANCELLED", null));
     }
 
-    @PutMapping("/{id}/status")
+    @PutMapping({"/{id}/status", "/alerts/{id}/status"})
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SECURITY')")
     public ResponseEntity<EmergencyAlertDto> updateStatus(@PathVariable Long id, @RequestParam String status, @RequestParam(required = false) Long resolverUserId) {
         return ResponseEntity.ok(emergencyAlertService.updateAlertStatus(id, status, resolverUserId));

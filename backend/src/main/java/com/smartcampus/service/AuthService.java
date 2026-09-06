@@ -166,4 +166,24 @@ public class AuthService {
                 .profileId(profileId)
                 .build();
     }
+
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new BadRequestException("Email address is required");
+        }
+        if (newPassword == null || newPassword.trim().length() < 4) {
+            throw new BadRequestException("New password must be at least 4 characters");
+        }
+
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new BadRequestException("No registered account found with email: " + email));
+
+        user.setPassword(passwordEncoder.encode(newPassword.trim()));
+        userRepository.save(user);
+
+        notificationService.createNotification(user, "Password Changed",
+                "Your account password has been successfully reset. If this wasn't you, contact security immediately.",
+                NotificationType.SYSTEM);
+    }
 }

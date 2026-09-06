@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShieldAlert, Bell, LogOut, User, Sparkles, Menu, X } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 
 export default function Navbar({ toggleSidebar, isSidebarOpen, onOpenSOS }) {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
 
   const roleColors = {
@@ -12,6 +14,20 @@ export default function Navbar({ toggleSidebar, isSidebarOpen, onOpenSOS }) {
     FACULTY: 'from-blue-600 to-cyan-600 text-blue-200 border-blue-500/30',
     STUDENT: 'from-emerald-600 to-teal-600 text-emerald-200 border-emerald-500/30',
     SECURITY: 'from-rose-600 to-amber-600 text-rose-200 border-rose-500/30',
+  };
+
+  const handleBrandClick = () => {
+    if (!user) {
+      navigate('/');
+      return;
+    }
+    const roleRoutes = {
+      ADMIN: '/admin',
+      FACULTY: '/faculty',
+      STUDENT: '/student',
+      SECURITY: '/security'
+    };
+    navigate(roleRoutes[user.role] || '/');
   };
 
   return (
@@ -26,8 +42,12 @@ export default function Navbar({ toggleSidebar, isSidebarOpen, onOpenSOS }) {
             {isSidebarOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
           
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20">
+          <button
+            type="button"
+            onClick={handleBrandClick}
+            className="flex items-center space-x-3 text-left group hover:opacity-90 transition-opacity"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
               <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
               </div>
@@ -40,7 +60,7 @@ export default function Navbar({ toggleSidebar, isSidebarOpen, onOpenSOS }) {
                 Unified Portal & Safety Network
               </span>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Right Actions */}

@@ -3,7 +3,7 @@ import { api } from '../../api';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import SOSModal from '../../components/SOSModal';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Building2, Trash2, Plus, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function AdminDashboard() {
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
     try {
       const [statsData, deptData, subjData, compData] = await Promise.all([
         api.getAdminStats().catch(() => null),
-        api.getDepartments().catch(() => []),
+        api.getAdminDepartments().catch(() => api.getDepartments().catch(() => [])),
         api.getSubjects().catch(() => []),
         api.getAdminComplaints().catch(() => []),
       ]);
@@ -89,6 +89,17 @@ export default function AdminDashboard() {
       loadAdminData();
     } catch (err) {
       setMsg({ type: 'error', text: err.message || 'Failed to create department.' });
+    }
+  };
+
+  const handleDeleteDepartment = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete department "${name}"?`)) return;
+    try {
+      await api.deleteDepartment(id);
+      setMsg({ type: 'success', text: `Department "${name}" deleted successfully!` });
+      loadAdminData();
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Failed to delete department.' });
     }
   };
 
@@ -187,9 +198,15 @@ export default function AdminDashboard() {
                   <div className="text-3xl font-bold text-purple-400 mt-1">{stats?.totalFaculties || 1}</div>
                 </div>
 
-                <div className="glass-card rounded-2xl p-5 border border-white/10">
-                  <div className="text-xs text-gray-400 font-medium">DEPARTMENTS</div>
-                  <div className="text-3xl font-bold text-blue-400 mt-1">{stats?.totalDepartments || 3}</div>
+                <div 
+                  onClick={() => setActiveTab('departments')}
+                  className="glass-card rounded-2xl p-5 border border-white/10 cursor-pointer hover:border-blue-500/40 hover:bg-blue-500/5 transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-gray-400 font-medium">DEPARTMENTS</div>
+                    <span className="text-[10px] text-blue-400 group-hover:underline font-semibold">+ Add Dept</span>
+                  </div>
+                  <div className="text-3xl font-bold text-blue-400 mt-1">{departments.length || stats?.totalDepartments || 0}</div>
                 </div>
 
                 <div className="glass-card rounded-2xl p-5 border border-white/10">
@@ -202,83 +219,151 @@ export default function AdminDashboard() {
 
           {/* DEPARTMENTS & SUBJECTS */}
           {activeTab === 'departments' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Register Dept */}
-              <div className="glass-panel rounded-3xl p-6 border border-white/10">
-                <h3 className="text-base font-bold text-white mb-4">Register Department</h3>
-                <form onSubmit={handleCreateDepartment} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Department Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={deptForm.name}
-                      onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
-                      placeholder="e.g. Electrical Engineering"
-                      className="w-full glass-input rounded-xl p-2.5 text-xs"
-                    />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Register Dept */}
+                <div className="glass-panel rounded-3xl p-6 border border-white/10">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Building2 className="w-5 h-5 text-indigo-400" />
+                    <h3 className="text-base font-bold text-white">Add New Department</h3>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Department Code</label>
-                    <input
-                      type="text"
-                      required
-                      value={deptForm.code}
-                      onChange={(e) => setDeptForm({ ...deptForm, code: e.target.value })}
-                      placeholder="e.g. EE"
-                      className="w-full glass-input rounded-xl p-2.5 text-xs"
-                    />
-                  </div>
-                  <button type="submit" className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-lg">
-                    Add Department
-                  </button>
-                </form>
-              </div>
-
-              {/* Register Subject */}
-              <div className="glass-panel rounded-3xl p-6 border border-white/10">
-                <h3 className="text-base font-bold text-white mb-4">Create Subject Course</h3>
-                <form onSubmit={handleCreateSubject} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Subject Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={subjForm.name}
-                      onChange={(e) => setSubjForm({ ...subjForm, name: e.target.value })}
-                      placeholder="e.g. Data Structures"
-                      className="w-full glass-input rounded-xl p-2.5 text-xs"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <form onSubmit={handleCreateDepartment} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Code</label>
+                      <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Department Name</label>
                       <input
                         type="text"
                         required
-                        value={subjForm.code}
-                        onChange={(e) => setSubjForm({ ...subjForm, code: e.target.value })}
-                        placeholder="CS301"
+                        value={deptForm.name}
+                        onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
+                        placeholder="e.g. Electrical Engineering"
                         className="w-full glass-input rounded-xl p-2.5 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Department</label>
-                      <select
-                        value={subjForm.departmentId}
-                        onChange={(e) => setSubjForm({ ...subjForm, departmentId: e.target.value })}
-                        className="w-full glass-input rounded-xl p-2.5 text-xs"
-                      >
-                        {departments.map((d) => (
-                          <option key={d.id} value={d.id} className="bg-slate-900">{d.name}</option>
-                        ))}
-                      </select>
+                      <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Department Code</label>
+                      <input
+                        type="text"
+                        required
+                        value={deptForm.code}
+                        onChange={(e) => setDeptForm({ ...deptForm, code: e.target.value })}
+                        placeholder="e.g. EE"
+                        className="w-full glass-input rounded-xl p-2.5 text-xs uppercase"
+                      />
                     </div>
+                    <button type="submit" className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-lg hover:opacity-95 transition-opacity flex items-center justify-center space-x-1.5">
+                      <Plus size={15} />
+                      <span>Add Department</span>
+                    </button>
+                  </form>
+                </div>
+
+                {/* Register Subject */}
+                <div className="glass-panel rounded-3xl p-6 border border-white/10">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Layers className="w-5 h-5 text-purple-400" />
+                    <h3 className="text-base font-bold text-white">Create Subject Course</h3>
                   </div>
-                  <button type="submit" className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-xs shadow-lg">
-                    Create Subject
-                  </button>
-                </form>
+                  <form onSubmit={handleCreateSubject} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Subject Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={subjForm.name}
+                        onChange={(e) => setSubjForm({ ...subjForm, name: e.target.value })}
+                        placeholder="e.g. Data Structures"
+                        className="w-full glass-input rounded-xl p-2.5 text-xs"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Code</label>
+                        <input
+                          type="text"
+                          required
+                          value={subjForm.code}
+                          onChange={(e) => setSubjForm({ ...subjForm, code: e.target.value })}
+                          placeholder="CS301"
+                          className="w-full glass-input rounded-xl p-2.5 text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Department</label>
+                        <select
+                          value={subjForm.departmentId}
+                          onChange={(e) => setSubjForm({ ...subjForm, departmentId: e.target.value })}
+                          className="w-full glass-input rounded-xl p-2.5 text-xs"
+                        >
+                          {departments.map((d) => (
+                            <option key={d.id} value={d.id} className="bg-slate-900">{d.name} ({d.code})</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <button type="submit" className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-xs shadow-lg hover:opacity-95 transition-opacity flex items-center justify-center space-x-1.5">
+                      <Plus size={15} />
+                      <span>Create Subject</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              {/* Department Directory Table */}
+              <div className="glass-panel rounded-3xl p-6 border border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <Building2 className="w-5 h-5 text-indigo-400" />
+                    <h3 className="text-base font-bold text-white">Campus Departments ({departments.length})</h3>
+                  </div>
+                  <span className="text-xs text-gray-400">All registered academic departments</span>
+                </div>
+
+                {departments.length === 0 ? (
+                  <p className="text-xs text-gray-400 py-6 text-center">No departments registered yet. Use the form above to add one.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-white/10 text-[11px] uppercase tracking-wider text-gray-400">
+                          <th className="py-3 px-4">Code</th>
+                          <th className="py-3 px-4">Department Name</th>
+                          <th className="py-3 px-4 text-center">Subjects</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5 text-xs">
+                        {departments.map((dept) => {
+                          const deptSubjects = subjects.filter(s => (s.department && s.department.id === dept.id) || s.departmentId === dept.id);
+                          return (
+                            <tr key={dept.id} className="hover:bg-white/5 transition-colors">
+                              <td className="py-3 px-4 font-mono font-bold text-indigo-400">
+                                <span className="px-2 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20">
+                                  {dept.code}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 font-medium text-white">{dept.name}</td>
+                              <td className="py-3 px-4 text-center text-gray-300">
+                                <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px]">
+                                  {deptSubjects.length} courses
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 text-right">
+                                <button
+                                  onClick={() => handleDeleteDepartment(dept.id, dept.name)}
+                                  className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[11px] font-medium transition-colors inline-flex items-center space-x-1"
+                                  title="Delete Department"
+                                >
+                                  <Trash2 size={13} />
+                                  <span>Delete</span>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

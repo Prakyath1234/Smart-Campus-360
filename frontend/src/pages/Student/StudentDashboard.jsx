@@ -12,7 +12,10 @@ import {
   ShieldAlert, 
   TrendingUp, 
   BookOpen,
-  Calculator
+  Calculator,
+  MapPin,
+  Search,
+  User
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -59,6 +62,11 @@ export default function StudentDashboard() {
   const [atsResult, setAtsResult] = useState(null);
   const [atsLoading, setAtsLoading] = useState(false);
 
+  // Timetable Class Selection states
+  const [selectedClassSemester, setSelectedClassSemester] = useState(5);
+  const [customSemesterInput, setCustomSemesterInput] = useState('5');
+  const [timetableLoading, setTimetableLoading] = useState(false);
+
   // Form states
   const [leaveForm, setLeaveForm] = useState({ startDate: '', endDate: '', reason: '' });
   const [complaintForm, setComplaintForm] = useState({ title: '', description: '', category: 'MAINTENANCE' });
@@ -83,6 +91,11 @@ export default function StudentDashboard() {
       setLeaveRequests(leaveData || []);
       setComplaints(compData || []);
       setAcademicSummary(summaryData);
+
+      if (profData?.semester) {
+        setSelectedClassSemester(profData.semester);
+        setCustomSemesterInput(String(profData.semester));
+      }
       
       if (marksData && marksData.length > 0) {
         setWhatIfRows(
@@ -96,6 +109,26 @@ export default function StudentDashboard() {
       }
     } catch (err) {
       console.error('Data load error:', err);
+    }
+  };
+
+  const handleFetchTimetableForSemester = async (sem) => {
+    const semNum = Number(sem);
+    if (!semNum || semNum < 1 || semNum > 8) {
+      setMsg({ type: 'error', text: 'Please enter a valid semester number between 1 and 8.' });
+      return;
+    }
+    setSelectedClassSemester(semNum);
+    setCustomSemesterInput(String(semNum));
+    setTimetableLoading(true);
+    try {
+      const data = await api.getStudentTimetable(semNum);
+      setTimetable(data || []);
+      setMsg({ type: 'success', text: `Loaded class timetable for Semester ${semNum}!` });
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Failed to load timetable for selected class.' });
+    } finally {
+      setTimetableLoading(false);
     }
   };
 
@@ -439,32 +472,154 @@ export default function StudentDashboard() {
 
           {/* TAB 3: TIMETABLE */}
           {activeTab === 'timetable' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-panel rounded-3xl p-6 border border-white/10">
-              <h3 className="text-lg font-bold text-white mb-4">Weekly Class Schedule</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].map((day) => {
-                  const dayClasses = timetable.filter((t) => t.dayOfWeek === day);
-                  return (
-                    <div key={day} className="glass-card rounded-2xl p-4 border border-white/10">
-                      <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3">{day}</h4>
-                      {dayClasses.length === 0 ? (
-                        <p className="text-xs text-gray-500 py-2">No scheduled lectures</p>
-                      ) : (
-                        <div className="space-y-2">
-                          {dayClasses.map((c) => (
-                            <div key={c.id} className="p-2.5 bg-slate-900/60 rounded-xl border border-white/5">
-                              <div className="font-semibold text-xs text-gray-200">{c.subjectName || c.subject?.name}</div>
-                              <div className="text-[11px] text-gray-400 mt-1 flex justify-between">
-                                <span>{c.classroom}</span>
-                                <span className="text-indigo-300">{c.startTime} - {c.endTime}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+              <div className="glass-panel rounded-3xl p-6 border border-white/10">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300">
+                        <Calendar size={18} />
+                      </span>
+                      <h3 className="text-xl font-bold text-white">Class Timetable & Schedule</h3>
                     </div>
-                  );
-                })}
+                    <p className="text-xs text-gray-400 mt-1">
+                      Enter or select your class / semester to inspect all weekly lectures, faculty instructors, and classrooms.
+                    </p>
+                  </div>
+
+                  {/* Direct Class Entry & Quick Selector */}
+                  <div className="flex flex-wrap items-center gap-3 bg-slate-900/80 p-3 rounded-2xl border border-white/10">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-semibold text-gray-300">Enter Class Sem:</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="8"
+                        value={customSemesterInput}
+                        onChange={(e) => setCustomSemesterInput(e.target.value)}
+                        placeholder="1-8"
+                        className="w-16 px-2.5 py-1.5 rounded-xl bg-slate-950 border border-white/20 text-xs text-center font-bold text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+
+                    <button
+                      onClick={() => handleFetchTimetableForSemester(customSemesterInput)}
+                      disabled={timetableLoading}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-50 text-white font-bold text-xs flex items-center space-x-1.5 shadow-md transition-all"
+                    >
+                      <Search size={13} />
+                      <span>{timetableLoading ? 'Loading...' : 'View Timetable'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Semester Pill Buttons */}
+                <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/40 p-3 rounded-2xl border border-white/5">
+                  <span className="text-xs text-gray-400 font-medium">Quick Class Switch:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => {
+                      const isEnrolled = profile?.semester === sem;
+                      const isSelected = selectedClassSemester === sem;
+                      return (
+                        <button
+                          key={sem}
+                          onClick={() => handleFetchTimetableForSemester(sem)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1 ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/20'
+                              : 'bg-slate-800/80 hover:bg-slate-700/80 text-gray-300 border border-white/5'
+                          }`}
+                        >
+                          <span>Sem {sem}</span>
+                          {isEnrolled && (
+                            <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-semibold ml-0.5">
+                              My Class
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Active Class Status Banner */}
+                <div className="mb-6 p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/20 flex items-center justify-between text-xs">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-gray-300">
+                      Displaying Timetable for:{' '}
+                      <strong className="text-white font-bold">
+                        Semester {selectedClassSemester} ({profile?.departmentName || 'Computer Science & Engineering'})
+                      </strong>
+                    </span>
+                  </div>
+                  <span className="text-indigo-300 font-semibold">
+                    {timetable.length} {timetable.length === 1 ? 'class slot' : 'classes scheduled'}
+                  </span>
+                </div>
+
+                {/* Weekly Grid */}
+                {timetable.length === 0 ? (
+                  <div className="p-12 text-center text-gray-400 text-xs bg-slate-900/40 rounded-2xl border border-white/5">
+                    No classes scheduled for Semester {selectedClassSemester} at this time.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    {['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].map((day) => {
+                      const dayClasses = timetable.filter((t) => t.dayOfWeek === day);
+                      return (
+                        <div key={day} className="glass-card rounded-2xl p-4 border border-white/10 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between pb-2 mb-3 border-b border-white/10">
+                              <h4 className="text-xs font-black text-indigo-300 uppercase tracking-wider">{day}</h4>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold">
+                                {dayClasses.length} {dayClasses.length === 1 ? 'Class' : 'Classes'}
+                              </span>
+                            </div>
+
+                            {dayClasses.length === 0 ? (
+                              <p className="text-[11px] text-gray-500 py-6 text-center italic">No lectures</p>
+                            ) : (
+                              <div className="space-y-3">
+                                {dayClasses.map((c) => (
+                                  <div
+                                    key={c.id}
+                                    className="p-3 bg-slate-900/80 rounded-xl border border-white/5 hover:border-indigo-500/30 transition-all space-y-1.5"
+                                  >
+                                    <div className="font-bold text-xs text-white leading-tight">
+                                      {c.subjectName || c.subject?.name}
+                                    </div>
+                                    <div className="text-[10px] text-blue-400 font-mono">
+                                      {c.subjectCode || c.subject?.code}
+                                    </div>
+
+                                    {c.facultyName && (
+                                      <div className="text-[11px] text-gray-300 flex items-center space-x-1.5 pt-1">
+                                        <User size={11} className="text-purple-400" />
+                                        <span className="truncate">{c.facultyName}</span>
+                                      </div>
+                                    )}
+
+                                    <div className="pt-1 flex items-center justify-between text-[11px] text-gray-400 border-t border-white/5">
+                                      <span className="flex items-center space-x-1">
+                                        <MapPin size={11} className="text-pink-400" />
+                                        <span>{c.classroom}</span>
+                                      </span>
+                                      <span className="font-bold text-indigo-300 flex items-center space-x-1">
+                                        <Clock size={11} />
+                                        <span>{c.startTime} - {c.endTime}</span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

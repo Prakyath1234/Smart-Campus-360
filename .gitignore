@@ -34,8 +34,15 @@ application-local.properties
 logs/
 *.log
 
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
 # Operating System
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+

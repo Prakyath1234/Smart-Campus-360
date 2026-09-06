@@ -54,9 +54,20 @@ public class AdminController {
         this.emergencyAlertRepository = emergencyAlertRepository;
     }
 
+    @GetMapping("/departments")
+    public ResponseEntity<List<Department>> getAllDepartments() {
+        return ResponseEntity.ok(academicService.getAllDepartments());
+    }
+
     @PostMapping("/departments")
     public ResponseEntity<Department> createDepartment(@RequestBody Department dept) {
         return ResponseEntity.ok(academicService.createDepartment(dept));
+    }
+
+    @DeleteMapping("/departments/{id}")
+    public ResponseEntity<Map<String, String>> deleteDepartment(@PathVariable Long id) {
+        departmentRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "Department deleted successfully"));
     }
 
     @PostMapping("/subjects")
@@ -88,7 +99,7 @@ public class AdminController {
         return ResponseEntity.ok(leaveRequestService.getAllLeaveRequests());
     }
 
-    @GetMapping("/dashboard")
+    @GetMapping({"/dashboard", "/stats"})
     public ResponseEntity<Map<String, Object>> getDashboardStats() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalStudents", studentRepository.count());

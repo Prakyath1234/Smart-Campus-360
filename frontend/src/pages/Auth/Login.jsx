@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Mail, Lock, ArrowRight, ShieldAlert, Key } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Sparkles, Mail, Lock, ArrowRight, ShieldAlert, KeyRound, CheckCircle2, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '../../api';
 
 export default function Login() {
   const { login } = useAuth();
@@ -11,6 +12,15 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Forgot Password State
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetNewPassword, setResetNewPassword] = useState('');
+  const [resetConfirmPassword, setResetConfirmPassword] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,15 +33,45 @@ export default function Login() {
       else if (user && user.role === 'SECURITY') navigate('/security');
       else navigate('/student');
     } catch (err) {
-      setError(err.message || 'Invalid credentials');
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDemoLogin = (demoEmail) => {
-    setEmail(demoEmail);
-    setPassword('password');
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+
+    if (resetNewPassword.length < 4) {
+      setResetError('Password must be at least 4 characters');
+      return;
+    }
+
+    if (resetNewPassword !== resetConfirmPassword) {
+      setResetError('Passwords do not match');
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const res = await api.resetPassword(resetEmail, resetNewPassword);
+      setResetSuccess(res.message || 'Password reset successfully! Please log in with your new password.');
+      setEmail(resetEmail);
+      setPassword(resetNewPassword);
+      setTimeout(() => {
+        setShowForgotModal(false);
+        setResetSuccess('');
+        setResetEmail('');
+        setResetNewPassword('');
+        setResetConfirmPassword('');
+      }, 2000);
+    } catch (err) {
+      setResetError(err.message || 'Failed to reset password. Please check your email.');
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   return (
@@ -53,7 +93,7 @@ export default function Login() {
             </div>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Smart Campus 360</h1>
-          <p className="text-xs text-gray-400 mt-1">Sign in to your role-based unified portal</p>
+          <p className="text-xs text-gray-400 mt-1">Sign in with your official account credentials</p>
         </div>
 
         {error && (
@@ -74,7 +114,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@sode-edu.in"
+                placeholder="user@sode-edu.in"
                 className="w-full glass-input rounded-xl px-4 py-2.5 text-sm pl-10"
               />
               <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
@@ -82,9 +122,23 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setResetEmail(email);
+                  setResetError('');
+                  setResetSuccess('');
+                  setShowForgotModal(true);
+                }}
+                className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-medium hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
             <div className="relative">
               <input
                 type="password"
@@ -108,41 +162,6 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Demo Fast Autofill Credentials */}
-        <div className="mt-6 pt-6 border-t border-white/10">
-          <div className="flex items-center space-x-1.5 text-xs text-gray-400 font-semibold mb-3">
-            <Key size={14} className="text-indigo-400" />
-            <span>Quick Demo Auto-fill (@sode-edu.in):</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => handleDemoLogin('student@sode-edu.in')}
-              className="px-3 py-1.5 rounded-lg glass-card text-[11px] font-semibold text-emerald-300 hover:bg-emerald-500/10 border-emerald-500/20 text-left"
-            >
-              🎓 Student
-            </button>
-            <button
-              onClick={() => handleDemoLogin('faculty@sode-edu.in')}
-              className="px-3 py-1.5 rounded-lg glass-card text-[11px] font-semibold text-blue-300 hover:bg-blue-500/10 border-blue-500/20 text-left"
-            >
-              👨‍🏫 Faculty
-            </button>
-            <button
-              onClick={() => handleDemoLogin('admin@sode-edu.in')}
-              className="px-3 py-1.5 rounded-lg glass-card text-[11px] font-semibold text-purple-300 hover:bg-purple-500/10 border-purple-500/20 text-left"
-            >
-              👑 Admin
-            </button>
-            <button
-              onClick={() => handleDemoLogin('security@sode-edu.in')}
-              className="px-3 py-1.5 rounded-lg glass-card text-[11px] font-semibold text-rose-300 hover:bg-rose-500/10 border-rose-500/20 text-left"
-            >
-              🛡️ Security
-            </button>
-          </div>
-        </div>
-
         <p className="text-center text-xs text-gray-400 mt-6">
           Don't have an account?{' '}
           <Link to="/register" className="text-indigo-400 hover:underline font-semibold">
@@ -150,6 +169,121 @@ export default function Login() {
           </Link>
         </p>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <AnimatePresence>
+        {showForgotModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md glass-panel rounded-3xl p-6 border border-white/10 shadow-2xl relative"
+            >
+              <button
+                onClick={() => setShowForgotModal(false)}
+                className="absolute top-5 right-5 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="flex items-center space-x-3 mb-5">
+                <div className="p-2.5 bg-indigo-500/20 text-indigo-400 rounded-xl">
+                  <KeyRound size={22} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Reset Password</h3>
+                  <p className="text-xs text-gray-400">Set a new password for your account</p>
+                </div>
+              </div>
+
+              {resetError && (
+                <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center space-x-2">
+                  <ShieldAlert size={16} />
+                  <span>{resetError}</span>
+                </div>
+              )}
+
+              {resetSuccess && (
+                <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center space-x-2">
+                  <CheckCircle2 size={16} />
+                  <span>{resetSuccess}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                    Account Email
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      placeholder="user@sode-edu.in"
+                      className="w-full glass-input rounded-xl px-4 py-2.5 text-sm pl-10"
+                    />
+                    <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      required
+                      value={resetNewPassword}
+                      onChange={(e) => setResetNewPassword(e.target.value)}
+                      placeholder="Minimum 4 characters"
+                      className="w-full glass-input rounded-xl px-4 py-2.5 text-sm pl-10"
+                    />
+                    <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                    Confirm New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      required
+                      value={resetConfirmPassword}
+                      onChange={(e) => setResetConfirmPassword(e.target.value)}
+                      placeholder="Repeat new password"
+                      className="w-full glass-input rounded-xl px-4 py-2.5 text-sm pl-10"
+                    />
+                    <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotModal(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 text-sm font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={resetLoading}
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    {resetLoading ? 'Resetting...' : 'Update Password'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

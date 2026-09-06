@@ -61,6 +61,15 @@ export const api = {
     return handleResponse(res);
   },
 
+  resetPassword: async (email, newPassword) => {
+    const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, newPassword }),
+    });
+    return handleResponse(res);
+  },
+
   getDepartments: async () => {
     const res = await fetch(`${API_BASE_URL}/auth/departments`);
     return handleResponse(res);
@@ -79,8 +88,9 @@ export const api = {
     const res = await fetch(`${API_BASE_URL}/student/marks`, { headers: getAuthHeaders() });
     return handleResponse(res);
   },
-  getStudentTimetable: async () => {
-    const res = await fetch(`${API_BASE_URL}/student/timetable`, { headers: getAuthHeaders() });
+  getStudentTimetable: async (semester) => {
+    const url = semester ? `${API_BASE_URL}/student/timetable/${semester}` : `${API_BASE_URL}/student/timetable`;
+    const res = await fetch(url, { headers: getAuthHeaders() });
     return handleResponse(res);
   },
   getStudentLeaveRequests: async () => {
@@ -131,6 +141,14 @@ export const api = {
   },
   getFacultySubjects: async () => {
     const res = await fetch(`${API_BASE_URL}/faculty/subjects`, { headers: getAuthHeaders() });
+    return handleResponse(res);
+  },
+  getFacultyClasses: async () => {
+    const res = await fetch(`${API_BASE_URL}/faculty/classes`, { headers: getAuthHeaders() });
+    return handleResponse(res);
+  },
+  getFacultyTimetable: async () => {
+    const res = await fetch(`${API_BASE_URL}/faculty/classes`, { headers: getAuthHeaders() });
     return handleResponse(res);
   },
   getFacultyStudents: async (subjectId) => {
@@ -300,11 +318,22 @@ export const api = {
     return handleResponse(res);
   },
 
+  getAdminDepartments: async () => {
+    const res = await fetch(`${API_BASE_URL}/admin/departments`, { headers: getAuthHeaders() });
+    return handleResponse(res);
+  },
   createDepartment: async (deptData) => {
     const res = await fetch(`${API_BASE_URL}/admin/departments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify(deptData),
+    });
+    return handleResponse(res);
+  },
+  deleteDepartment: async (id) => {
+    const res = await fetch(`${API_BASE_URL}/admin/departments/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     return handleResponse(res);
   },
@@ -409,7 +438,7 @@ export const api = {
     return handleResponse(res);
   },
   updateAlertStatus: async (id, status) => {
-    const res = await fetch(`${API_BASE_URL}/emergency/alerts/${id}/status?status=${status}`, {
+    const res = await fetch(`${API_BASE_URL}/emergency/${id}/status?status=${status}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
     });

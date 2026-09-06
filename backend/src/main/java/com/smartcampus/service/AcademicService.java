@@ -100,6 +100,21 @@ public class AcademicService {
         return mapToFacultyDto(faculty);
     }
 
+    public FacultyDto getFacultyByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        Faculty faculty = facultyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Faculty profile not found for user: " + email));
+        return mapToFacultyDto(faculty);
+    }
+
+    public Faculty getFacultyEntityByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        return facultyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Faculty profile not found for user: " + email));
+    }
+
     public List<FacultyDto> getAllFaculty() {
         return facultyRepository.findAll().stream().map(this::mapToFacultyDto).collect(Collectors.toList());
     }
@@ -132,6 +147,29 @@ public class AcademicService {
         return subjectRepository.findAll().stream().map(this::mapToSubjectDto).collect(Collectors.toList());
     }
 
+    public List<SubjectDto> getSubjectsByFacultyId(Long facultyId) {
+        List<Subject> subjects = subjectRepository.findByFacultyId(facultyId);
+        if (subjects == null || subjects.isEmpty()) {
+            subjects = subjectRepository.findAll();
+        }
+        return subjects.stream().map(this::mapToSubjectDto).collect(Collectors.toList());
+    }
+
+    public List<StudentDto> getStudentsBySubjectId(Long subjectId) {
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
+        List<Student> students;
+        if (subject.getDepartment() != null) {
+            students = studentRepository.findByDepartmentId(subject.getDepartment().getId());
+        } else {
+            students = studentRepository.findAll();
+        }
+        if (students.isEmpty()) {
+            students = studentRepository.findAll();
+        }
+        return students.stream().map(this::mapToStudentDto).collect(Collectors.toList());
+    }
+
     // --- Attendance Methods ---
     @Transactional
     public AttendanceDto recordAttendance(AttendanceDto dto) {
@@ -140,9 +178,7 @@ public class AcademicService {
         Subject subject = subjectRepository.findById(dto.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
-        if (attendanceRepository.findByStudentIdAndSubjectIdAndDate(dto.getStudentId(), dto.getSubjectId(), dto.getDate()).isPresent()) {
-            throw new BadRequestException("Attendance already recorded for this student, subject, and date");
-        }
+        LocalDate attDate = dto.getDate() != null ? dto.getDate() : LocalDate.now();
 
         AttendanceStatus status;
         try {
@@ -151,14 +187,30 @@ public class AcademicService {
             throw new BadRequestException("Invalid status. Must be PRESENT or ABSENT");
         }
 
-        Attendance attendance = Attendance.builder()
-                .student(student)
-                .subject(subject)
-                .date(dto.getDate() != null ? dto.getDate() : LocalDate.now())
-                .status(status)
-                .build();
+        Attendance attendance = attendanceRepository
+                .findByStudentIdAndSubjectIdAndDate(dto.getStudentId(), dto.getSubjectId(), attDate)
+                .orElse(null);
+
+        if (attendance != null) {
+            attendance.setStatus(status);
+        } else {
+            attendance = Attendance.builder()
+                    .student(student)
+                    .subject(subject)
+                    .date(attDate)
+                    .status(status)
+                    .build();
+        }
 
         return mapToAttendanceDto(attendanceRepository.save(attendance));
+    }
+
+    @Transactional
+    public List<AttendanceDto> recordAttendanceBulk(List<AttendanceDto> dtos) {
+        if (dtos == null || dtos.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        return dtos.stream().map(this::recordAttendance).collect(Collectors.toList());
     }
 
     public List<AttendanceDto> getStudentAttendance(Long studentId) {
@@ -252,6 +304,16 @@ public class AcademicService {
         return timetableRepository.findBySemester(semester).stream()
                 .map(this::mapToTimetableDto)
                 .collect(Collectors.toList());
+    }
+
+    public List<TimetableDto> getFacultyTimetable(Long facultyId) {
+        List<Timetable> slots = timetableRepository.findBySubjectFacultyId(facultyId);
+        return slots.stream().map(this::mapToTimetableDto).collect(Collectors.toList());
+    }
+
+    public List<TimetableDto> getFacultyTimetableByEmail(String email) {
+        Faculty faculty = getFacultyEntityByEmail(email);
+        return getFacultyTimetable(faculty.getId());
     }
 
     private void validateTimetableConflict(TimetableDto dto, Subject subject) {

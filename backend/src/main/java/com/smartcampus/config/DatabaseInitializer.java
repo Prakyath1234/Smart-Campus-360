@@ -98,7 +98,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .build();
         userRepository.save(securityUser);
 
-        // 3. Create Student Profile
+        // 3. Create Student Profiles
         Student student = Student.builder()
                 .user(studentUser)
                 .rollNumber("CS2026001")
@@ -107,6 +107,42 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .enrollmentDate(LocalDate.now())
                 .build();
         student = studentRepository.save(student);
+
+        User student2User = User.builder()
+                .name("Alex Smith")
+                .email("alex@sode-edu.in")
+                .password(hashedPassword)
+                .role(Role.STUDENT)
+                .phone("9876543220")
+                .enabled(true)
+                .build();
+
+        Student student2 = Student.builder()
+                .user(student2User)
+                .rollNumber("CS2026002")
+                .department(cse)
+                .semester(5)
+                .enrollmentDate(LocalDate.now())
+                .build();
+        studentRepository.save(student2);
+
+        User student3User = User.builder()
+                .name("Priya Sharma")
+                .email("priya@sode-edu.in")
+                .password(hashedPassword)
+                .role(Role.STUDENT)
+                .phone("9876543221")
+                .enabled(true)
+                .build();
+
+        Student student3 = Student.builder()
+                .user(student3User)
+                .rollNumber("CS2026003")
+                .department(cse)
+                .semester(5)
+                .enrollmentDate(LocalDate.now())
+                .build();
+        studentRepository.save(student3);
 
         // 4. Create Faculty Profile
         Faculty faculty = Faculty.builder()
@@ -126,26 +162,68 @@ public class DatabaseInitializer implements CommandLineRunner {
         dbms = subjectRepository.save(dbms);
         cn = subjectRepository.save(cn);
 
-        // 6. Create Timetable Slots
-        Timetable t1 = Timetable.builder()
-                .dayOfWeek("MONDAY")
-                .startTime(LocalTime.of(9, 0))
-                .endTime(LocalTime.of(10, 0))
-                .subject(se)
-                .classroom("Lab 1")
-                .semester(5)
-                .build();
-        timetableRepository.save(t1);
+        // Subjects for other semesters
+        Subject dsa = Subject.builder().name("Data Structures & Algorithms").code("CS301").department(cse).credits(4).build();
+        subjectRepository.save(dsa);
+        Subject ai = Subject.builder().name("Artificial Intelligence").code("CS701").department(cse).credits(4).build();
+        subjectRepository.save(ai);
 
-        Timetable t2 = Timetable.builder()
-                .dayOfWeek("MONDAY")
-                .startTime(LocalTime.of(10, 0))
-                .endTime(LocalTime.of(11, 0))
-                .subject(dbms)
-                .classroom("Room 302")
-                .semester(5)
-                .build();
-        timetableRepository.save(t2);
+        // 6. Create Timetable Slots (Semester 5 - Weekly schedule for Dr. Sarah Jenkins and CSE Sem 5)
+        // MONDAY
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("MONDAY").startTime(LocalTime.of(9, 0)).endTime(LocalTime.of(10, 0))
+                .subject(se).classroom("Lab 1").semester(5).build());
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("MONDAY").startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0))
+                .subject(dbms).classroom("Room 302").semester(5).build());
+
+        // TUESDAY
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("TUESDAY").startTime(LocalTime.of(9, 0)).endTime(LocalTime.of(10, 0))
+                .subject(dbms).classroom("Lab 2").semester(5).build());
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("TUESDAY").startTime(LocalTime.of(11, 0)).endTime(LocalTime.of(12, 0))
+                .subject(se).classroom("Room 301").semester(5).build());
+
+        // WEDNESDAY
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("WEDNESDAY").startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0))
+                .subject(se).classroom("Room 301").semester(5).build());
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("WEDNESDAY").startTime(LocalTime.of(14, 0)).endTime(LocalTime.of(15, 0))
+                .subject(cn).classroom("Lab 3").semester(5).build());
+
+        // THURSDAY
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("THURSDAY").startTime(LocalTime.of(9, 0)).endTime(LocalTime.of(10, 0))
+                .subject(dbms).classroom("Room 302").semester(5).build());
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("THURSDAY").startTime(LocalTime.of(11, 0)).endTime(LocalTime.of(12, 0))
+                .subject(se).classroom("Lab 1").semester(5).build());
+
+        // FRIDAY
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("FRIDAY").startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0))
+                .subject(dbms).classroom("Room 302").semester(5).build());
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("FRIDAY").startTime(LocalTime.of(14, 0)).endTime(LocalTime.of(15, 0))
+                .subject(cn).classroom("Room 204").semester(5).build());
+
+        // Semester 3 Slots
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("MONDAY").startTime(LocalTime.of(11, 0)).endTime(LocalTime.of(12, 0))
+                .subject(dsa).classroom("Room 101").semester(3).build());
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("WEDNESDAY").startTime(LocalTime.of(11, 0)).endTime(LocalTime.of(12, 0))
+                .subject(dsa).classroom("Lab 2").semester(3).build());
+
+        // Semester 7 Slots
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("TUESDAY").startTime(LocalTime.of(14, 0)).endTime(LocalTime.of(15, 0))
+                .subject(ai).classroom("Seminar Hall").semester(7).build());
+        timetableRepository.save(Timetable.builder()
+                .dayOfWeek("THURSDAY").startTime(LocalTime.of(14, 0)).endTime(LocalTime.of(15, 0))
+                .subject(ai).classroom("Lab 4").semester(7).build());
 
         // 7. Seed Mentorship
         Mentorship mentorship = Mentorship.builder()

@@ -84,45 +84,69 @@ export default function LandingPage() {
 
         {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-20 w-full text-left">
-          <div className="glass-panel rounded-3xl p-6 border border-white/10 space-y-3 hover:border-indigo-500/30 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+          <Link
+            to="/login"
+            className="glass-panel rounded-3xl p-6 border border-white/10 space-y-3 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all group block cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform">
               <GraduationCap size={24} />
             </div>
-            <h3 className="text-base font-bold text-white">Student Workspace</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">Student Workspace</h3>
+              <ArrowRight size={14} className="text-gray-500 group-hover:text-emerald-400 transition-colors" />
+            </div>
             <p className="text-xs text-gray-400 leading-relaxed">
               Track attendance percentage, view subject-wise marks, view weekly timetables, and submit leave applications.
             </p>
-          </div>
+          </Link>
 
-          <div className="glass-panel rounded-3xl p-6 border border-white/10 space-y-3 hover:border-indigo-500/30 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20">
+          <Link
+            to="/login"
+            className="glass-panel rounded-3xl p-6 border border-white/10 space-y-3 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group block cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
               <BookOpen size={24} />
             </div>
-            <h3 className="text-base font-bold text-white">Faculty Portal</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">Faculty Portal</h3>
+              <ArrowRight size={14} className="text-gray-500 group-hover:text-blue-400 transition-colors" />
+            </div>
             <p className="text-xs text-gray-400 leading-relaxed">
               Log daily class attendance with instant student toggles, record grades, and review leave applications.
             </p>
-          </div>
+          </Link>
 
-          <div className="glass-panel rounded-3xl p-6 border border-white/10 space-y-3 hover:border-indigo-500/30 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20">
+          <Link
+            to="/login"
+            className="glass-panel rounded-3xl p-6 border border-white/10 space-y-3 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all group block cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20 group-hover:scale-110 transition-transform">
               <Building size={24} />
             </div>
-            <h3 className="text-base font-bold text-white">Admin Control</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">Admin Control</h3>
+              <ArrowRight size={14} className="text-gray-500 group-hover:text-purple-400 transition-colors" />
+            </div>
             <p className="text-xs text-gray-400 leading-relaxed">
               System analytics dashboard, department and subject registration, timetable assigner, and complaint resolution hub.
             </p>
-          </div>
+          </Link>
 
-          <div className="glass-panel rounded-3xl p-6 border border-red-500/30 space-y-3 bg-red-950/20 hover:border-red-500/50 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/40 animate-pulse">
+          <Link
+            to="/login"
+            className="glass-panel rounded-3xl p-6 border border-red-500/30 space-y-3 bg-red-950/20 hover:border-red-500/60 hover:bg-red-900/20 transition-all group block cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/40 animate-pulse group-hover:scale-110 transition-transform">
               <ShieldAlert size={24} />
             </div>
-            <h3 className="text-base font-bold text-white">Security Command</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white group-hover:text-red-300 transition-colors">Security Command</h3>
+              <ArrowRight size={14} className="text-red-400 group-hover:translate-x-1 transition-transform" />
+            </div>
             <p className="text-xs text-gray-400 leading-relaxed">
               Real-time SOS distress telemetry feed with live GPS coordinates, student contact dialer, and dispatch management.
             </p>
-          </div>
+          </Link>
         </div>
       </main>
 
