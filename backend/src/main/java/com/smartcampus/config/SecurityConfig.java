@@ -75,7 +75,8 @@ public class SecurityConfig {
             "http://127.0.0.1:5173",
             "http://localhost:8080",
             "http://127.0.0.1:8080",
-            "https://*.vercel.app"
+            "https://*.vercel.app",
+            "https://*.onrender.com"
         ));
 
         String customOrigins = System.getenv("CORS_ALLOWED_ORIGINS");

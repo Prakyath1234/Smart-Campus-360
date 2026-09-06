@@ -6,9 +6,10 @@ This guide describes how the SmartCampus 360 suite is deployed to cloud producti
 
 ## 🌐 Live Production Deployments
 
+* **Render Full-Stack App**: [https://smart-campus-360-mmnl.onrender.com](https://smart-campus-360-mmnl.onrender.com)
 * **Production Frontend (Vercel)**: [https://smart-campus-360-sandy.vercel.app](https://smart-campus-360-sandy.vercel.app)
-* **Production Backend (Render)**: [https://smart-campus-backend-8v6m.onrender.com](https://smart-campus-backend-8v6m.onrender.com)
-* **Health Check Endpoint**: [https://smart-campus-backend-8v6m.onrender.com/actuator/health](https://smart-campus-backend-8v6m.onrender.com/actuator/health)
+* **Production Backend (Render)**: [https://smart-campus-360-mmnl.onrender.com](https://smart-campus-360-mmnl.onrender.com)
+* **Health Check Endpoint**: [https://smart-campus-360-mmnl.onrender.com/actuator/health](https://smart-campus-360-mmnl.onrender.com/actuator/health)
 * **Database Provider**: Managed Aiven Cloud MySQL 8.0 (`DB_SSL=true`)
 
 ---
@@ -22,7 +23,7 @@ This guide describes how the SmartCampus 360 suite is deployed to cloud producti
                ▼ (Public HTTPS Web Traffic)                  ▼ (API Requests / CORS)
   [ Vercel Frontend CDN ]                      [ Render Backend Web Service ]
    └─ React 18 SPA                              └─ Java 21 + LibreOffice
-   └─ URL: https://smart-campus-360-sandy.vercel.app └─ URL: https://smart-campus-backend-8v6m.onrender.com
+   └─ URL: https://smart-campus-360-sandy.vercel.app └─ URL: https://smart-campus-360-mmnl.onrender.com
                                                              │
                                                              ▼ (Remote SSL Connection)
                                                  [ Aiven Cloud Managed MySQL ]
@@ -46,7 +47,7 @@ This guide describes how the SmartCampus 360 suite is deployed to cloud producti
 * `CORS_ALLOWED_ORIGINS`: `https://smart-campus-360-sandy.vercel.app,https://*.vercel.app`
 
 ### B. Vercel Frontend Environment Variables
-* `VITE_API_URL`: `https://smart-campus-backend-8v6m.onrender.com`
+* `VITE_API_URL`: `https://smart-campus-360-mmnl.onrender.com`
 
 ---
 
@@ -57,7 +58,7 @@ This guide describes how the SmartCampus 360 suite is deployed to cloud producti
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://smart-campus-backend-8v6m.onrender.com/api/$1"
+      "destination": "https://smart-campus-360-mmnl.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",

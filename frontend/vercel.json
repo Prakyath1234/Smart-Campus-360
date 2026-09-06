@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://0db1802274de7c.lhr.life/api/$1"
+      "destination": "https://smart-campus-360-mmnl.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",

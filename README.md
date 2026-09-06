@@ -8,7 +8,7 @@
 
 | Component | Platform | Live URL / Endpoint |
 |---|---|---|
-| **Render Cloud Full-Stack** | **Render (Free Tier)** | Single Unified Service (Frontend + Backend) |
+| **Render Cloud Full-Stack** | **Render (Free Tier)** | [https://smart-campus-360-mmnl.onrender.com](https://smart-campus-360-mmnl.onrender.com) |
 | **Production Frontend** | **Vercel** | [https://smart-campus-360-sandy.vercel.app](https://smart-campus-360-sandy.vercel.app) |
 | **GitHub Repository** | **GitHub** | [https://github.com/Prakyath1234/Smart-Campus-360](https://github.com/Prakyath1234/Smart-Campus-360) |
 
@@ -98,10 +98,10 @@ This spawns three containers:
 - **`smart-campus-backend`**: Spring Boot API with isolated LibreOffice instance on port `8080`.
 - **`smart-campus-mysql`**: Local MySQL 8.0 instance on port `3306` with persistent storage.
 
-### ☁️ Production Cloud Deployment (Vercel + Render + Aiven MySQL)
-- **Production Frontend**: Deployed on Vercel at [https://smart-campus-360-sandy.vercel.app](https://smart-campus-360-sandy.vercel.app)
-- **Production Backend**: Deployed on Render at [https://smart-campus-backend-8v6m.onrender.com](https://smart-campus-backend-8v6m.onrender.com)
-- **Production Database**: Hosted on Aiven Cloud Managed MySQL 8.0
+### ☁️ Production Cloud Deployment (Render Full-Stack + Vercel)
+- **Production Full-Stack App (Render)**: [https://smart-campus-360-mmnl.onrender.com](https://smart-campus-360-mmnl.onrender.com)
+- **Production Frontend (Vercel)**: [https://smart-campus-360-sandy.vercel.app](https://smart-campus-360-sandy.vercel.app)
+- **Health Check Endpoint**: [https://smart-campus-360-mmnl.onrender.com/actuator/health](https://smart-campus-360-mmnl.onrender.com/actuator/health)
 - Blueprint schema: [`render.yaml`](file:///f:/360/Smart-Campus-360/render.yaml)
 - Detailed instructions: [docs/render-deployment.md](file:///f:/360/Smart-Campus-360/docs/render-deployment.md)
 
