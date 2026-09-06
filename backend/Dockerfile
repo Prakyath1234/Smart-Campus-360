@@ -27,6 +27,6 @@ EXPOSE 8080
 COPY --from=build /app/target/smart-campus-360-1.0.0-SNAPSHOT.jar app.jar
 
 ENV SMARTTOOLS_LIBREOFFICE_PATH=/usr/bin/soffice
-ENV SPRING_PROFILES_ACTIVE=mysql
+ENV SPRING_PROFILES_ACTIVE=h2
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
